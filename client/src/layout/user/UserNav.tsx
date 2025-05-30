@@ -14,7 +14,7 @@ const navLinks = [
 const UserNav = () => {
 
   return (
-    <nav className="w-screen">
+    <nav className="w-100dvw">
       <section className=" sm:text-[14px] text-[12px]  w-full bg-black text-gray-400 text-center">
         <p>India's Fastest Online Shopping Destination <span className="text-gray-300 underline hover:text-gray-400">Shop Now</span></p>
       </section>

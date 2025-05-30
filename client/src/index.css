@@ -1,12 +1,24 @@
 @import "tailwindcss";
 /*font-family: 'Anton', 'Inter', 'Nunito', 'Outfit', 'Poppins', 'Roboto', 'Space Grotesk', 'Work Sans', sans-serif;*/
 
-
-
+@import "swiper/css/pagination";
+@import "swiper/css/scrollbar";
+@import "swiper/css";
+@import "swiper/css/effect-coverflow";
+.swiper-pagination-bullet-active {
+     background-color: gainsboro !important;
+}
+.swiper-pagination-bullet {
+  background-color: rgb(255, 255, 255);
+  opacity: 1;
+}
 .header-logo{
     font-family: 'Anton',sans-serif ;
     font-size: x-large;
     
+}
+.font-text{
+    font-family:'Outfit',sans-serif ;
 }
 
 

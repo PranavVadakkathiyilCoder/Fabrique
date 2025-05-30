@@ -1,10 +1,12 @@
 import { Route, Routes } from 'react-router-dom'
-import UserNav from './layout/user/UserNav'
+//import UserHome from './pages/user/UserHome'
+import ProductCard from './components/user/ProductCard'
 
 const App = () => {
   return (
     <Routes>
-      <Route path='/' element={<UserNav/>}/>
+      <Route path='/' element={<ProductCard/>}/>
+
     </Routes>
   )
 }
