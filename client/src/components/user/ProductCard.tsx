@@ -2,9 +2,9 @@ import shirt from '../../assets/shirt.png'
 const ProductCard = () => {
   return (
     <>
-      <section className=' h-[300px] w-[200px] '>
+      <section className='col-span-1 border border-gray-100'>
 
-        <img src={shirt} alt="img" className=' w-full bg-gray-100 rounded-xl' />
+        <img src={shirt} alt="img" className=' w-full bg-gray-100 rounded-xl p-1' />
 
         <div className='w-full font-text  text-center'>
           <p className='text-xl '>Name allensholly</p>

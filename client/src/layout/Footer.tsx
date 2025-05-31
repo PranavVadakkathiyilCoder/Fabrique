@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { FaTwitter,FaFacebook,FaInstagram ,FaGithub   } from "react-icons/fa";
 import RazoImg from '../assets/razorpay_img.png'
+import NewsLetter from "./user/NewsLetter";
 
 const Footer = () => {
  const footer = [
@@ -76,7 +77,8 @@ const socialIcons = [
 
 
   return (
-    <footer className="bg-[#f0f0f0]">
+    <footer>
+      <NewsLetter/>
        <section className="  p-4 sm:flex justify-evenly items-center">
          <section>
             <div className="flex flex-col items-center justify-center">

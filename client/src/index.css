@@ -17,11 +17,12 @@
     font-size: x-large;
     
 }
-.font-text{
+*{
     font-family:'Outfit',sans-serif ;
 }
-
-
+::-webkit-scrollbar {
+    display: none;
+}
 .footer-logo{
     font-family: 'Poppins:ital',sans-serif ;
     font-weight: 800;
