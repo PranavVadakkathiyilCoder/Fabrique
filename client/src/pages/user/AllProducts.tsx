@@ -2,7 +2,7 @@ import { useState } from "react"
 import { FaStar, FaStarHalfAlt } from "react-icons/fa"
 import { IoClose } from "react-icons/io5"
 import ProductCard from "../../components/user/ProductCard"
- 
+import { useParams } from "react-router-dom"
 const categories = [
     { data: "T-Shirts" },
     { data: "Shirts" },
@@ -34,7 +34,9 @@ const Material = [
 
 const AllProducts = () => {
     const [price, setPrice] = useState<string>("200")
-
+    const product = useParams()
+    console.log(product);
+    
 
     return (
         <>
