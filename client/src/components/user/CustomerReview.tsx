@@ -1,6 +1,6 @@
 import { FaStar } from "react-icons/fa"
 import { MdVerified } from "react-icons/md"
-import ReviewCard from "./ReviewCard"
+import ReviewCard from "../ReviewCard"
 
 
 const CustomerReview = () => {

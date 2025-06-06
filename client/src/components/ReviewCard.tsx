@@ -4,7 +4,9 @@ import { MdVerified } from "react-icons/md"
 
 const ReviewCard = () => {
   return (
-    <>
+    <div className="w-full p-4">
+      <h2 className="text-2xl font-bold mb-4">Customer Chats</h2>
+
      <div className=' col-span-1  max-w-sm max-h-[320px]  border border-gray-300  flex-col  rounded-xl inline-block sm:inline-flex sm:m-5 m-1'>
                     <div className="p-3">
                     <FaStar className="text-yellow-300 text-xl"/>
@@ -35,7 +37,7 @@ const ReviewCard = () => {
                 </div>
                
                 
-    </>
+    </div>
   )
 }
 

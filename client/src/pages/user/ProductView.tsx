@@ -1,8 +1,8 @@
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
-import CustomerReview from "./CustomerReview";
-import ReviewCard from "./ReviewCard";
-import TopSelling from "./TopSelling";
-import NewArrivels from "./NewArrivels";
+import CustomerReview from "../../components/user/CustomerReview";
+import ReviewCard from "../../components/ReviewCard";
+import TopSelling from "../../components/user/TopSelling";
+import NewArrivels from "../../components/user/NewArrivels";
 
 function ProductView() {
     return (
@@ -89,7 +89,7 @@ function ProductView() {
             {/* Additional Sections */}
             <NewArrivels />
             <TopSelling />
-            <CustomerReview />
+            
         </div>
     );
 }
