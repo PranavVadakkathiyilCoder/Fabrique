@@ -5,7 +5,7 @@ import { IoMdAdd } from 'react-icons/io'
 const ProductManage: React.FC = () => {
   return (
     <div className="w-full p-4">
-      <h2 className="text-2xl font-bold mb-4">Customer Chats</h2>
+      <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
     <div>
         <button className='flex gap-3 px-6 py-1 m-1 bg-black text-white rounded-sm'>Add Product<IoMdAdd className='text-2xl '/></button>
     </div>

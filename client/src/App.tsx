@@ -13,29 +13,42 @@ import Order from './pages/seller/Orders'
 import Reviews from './pages/seller/Reviews'
 import Chats from './pages/seller/Chats'
 import SellerHeader from './layout/seller/SellerHeader'
+import AdminHome from './pages/admin/AdminHome'
+import AdminHeader from './layout/admin/AdminHeader'
+import Products from './pages/admin/Products'
+import Users from './pages/admin/Users'
+import Sellers from './pages/admin/Sellers'
+import AllReviews from './pages/admin/AllReviews'
 const App = () => {
   return (
     <>
-    <SellerHeader/>
-    <Routes>
-      {/*<Route path='/' element={<UserHome/>}/>
+      {/*<SellerHeader/>*/}
+      <AdminHeader />
+      <Routes>
+        {/*<Route path='/' element={<UserHome/>}/>
       <Route path='/product/:category' element={<AllProducts/>}/>
       <Route path='/view' element={<ProductView/>}/>
       <Route path='/com' element={<NavBarMobile/>}/>
       <Route path='/cart' element={<Cart/>}/>
       <Route path='/checkout' element={<CheckOut/>}/>
       <Route path='/order' element={<OrdersList/>}/>*/}
-      
-      <Route path='/store' element={<StoreHome/>}/>
+
+        {/*<Route path='/store' element={<StoreHome/>}/>
       <Route path='/manageproduct' element={<ProductManage/>}/>
       <Route path='/orders' element={<Order/>}/>
       <Route path='/reviews' element={<Reviews/>}/>
-      <Route path='/chats' element={<Chats/>}/>
+      <Route path='/chats' element={<Chats/>}/>*/}
+        <Route path='/admin' element={<AdminHome />} />
+        <Route path='/manage_product' element={<Products/>} />
+        <Route path='/manage_user' element={<Users />} />
+        <Route path='/manage_seller' element={<Sellers />} />
+        <Route path='/reviews/:_id' element={<AllReviews/>} />
 
 
-    </Routes>
+
+      </Routes>
     </>
-    
+
   )
 }
 

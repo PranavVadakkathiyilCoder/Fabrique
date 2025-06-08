@@ -1,5 +1,11 @@
-import ReviewCard from '../../components/ReviewCard'
- const reviewsData = [
+import { useParams } from 'react-router-dom';
+import ReviewCard from '../../components/ReviewCard';
+
+const AllReviews = () => {
+  const _id = useParams<{_id:string}>()
+  console.log(_id);
+  
+  const reviewsData = [
     {
       name: 'Pranav V',
       review: 'Lorem ipsum Lorem, ipsum dolor. Lorem ipsum dolor sit amet consectetur.',
@@ -18,26 +24,9 @@ import ReviewCard from '../../components/ReviewCard'
       verified: false,
       stars: 3,
     },
-    {
-      name: 'Pranav V',
-      review: 'Lorem ipsum Lorem, ipsum dolor. Lorem ipsum dolor sit amet consectetur.',
-      verified: true,
-      stars: 5,
-    },
-    {
-      name: 'John Doe',
-      review: 'Amazing product! Will buy again.',
-      verified: true,
-      stars: 4,
-    },
-    {
-      name: 'Jane Smith',
-      review: 'Good quality but delivery was late.',
-      verified: false,
-      stars: 3,
-    },
+    
   ];
-const Reviews = () => {
+
   return (
     <div className="w-full p-4">
       <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
@@ -53,6 +42,6 @@ const Reviews = () => {
       ))}
     </div>
   );
-}
+};
 
-export default Reviews
+export default AllReviews;
