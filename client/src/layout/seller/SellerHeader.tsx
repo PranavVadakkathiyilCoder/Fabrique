@@ -1,4 +1,3 @@
-import { FiSearch } from "react-icons/fi"
 import { GiHamburgerMenu } from "react-icons/gi"
 import { IoMdContact } from "react-icons/io"
 import { MdOutlineShoppingBag } from "react-icons/md"
@@ -21,7 +20,7 @@ const SellerHeader = () => {
           <section className="flex w-full items-center justify-evenly py-3 border-b-1">
                     <p className="sm:hidden block"><GiHamburgerMenu className="text-2xl" onClick={()=>setsellerNav(!sellerNav)}/></p>
 
-            <p className="header-logo flex items-center gap-2">FABRIQUE.CO <span className="text-xl rounded-full px-1 bg-black text-white ">Seller</span></p>
+            <p className="header-logo flex items-center gap-2">FABRIQUE.CO <span className="text-xl rounded-full px-3 bg-black text-white ">Seller</span></p>
             <ul className="sm:flex gap-5 sm hidden">
               {navLinks.map((link, index) => (
         <li key={index} className="cursor-pointer text-gray-600 hover:text-black transition">

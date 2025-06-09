@@ -35,7 +35,7 @@ const Dashboard = () => {
                 <BarChart chartdata={BarChartData} />
             </section>
             <section>
-                <p className="text-2xl font-bold  p-4">Stocks</p>
+                <p className="text-2xl font-bold flex  p-4">Stocks</p>
                 <Piechart PieChartData={PieChartData} />
                 <Piechart PieChartData={PieChartData} />
                 <Piechart PieChartData={PieChartData} />
