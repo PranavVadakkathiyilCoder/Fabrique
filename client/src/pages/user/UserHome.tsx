@@ -5,12 +5,12 @@ import UserNav from "../../layout/user/UserNav"
 
 import CustomerReview from "../../components/user/CustomerReview"
 import Footer from "../../layout/Footer"
-import NavBarMobile from "../../layout/user/NavBarMobile"
+import NavBarMobile from "../../layout/user/NavUserMobile"
 
 const UserHome = () => {
   return (
     <>
-    <UserNav/>
+    
     <Slider/>
     <NewArrivels/>
     <TopSelling/>

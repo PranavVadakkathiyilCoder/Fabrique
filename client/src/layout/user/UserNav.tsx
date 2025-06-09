@@ -3,7 +3,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdContact } from "react-icons/io"
 import { MdOutlineShoppingBag } from "react-icons/md"
 import { Link } from "react-router-dom";
- 
+import { useNavContext } from "../../context/NavContext";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "New Arrivals", path: "/new" },
@@ -12,14 +12,16 @@ const navLinks = [
 ];
 
 const UserNav = () => {
-
+  const {userNav,setuserNav} = useNavContext()
+  console.log(userNav);
+  
   return (
     <nav className="w-100dvw">
       <section className=" sm:text-[14px] text-[12px]  w-full bg-black text-gray-400 text-center">
         <p>India's Fastest Online Shopping Destination <span className="text-gray-300 underline hover:text-gray-400">Shop Now</span></p>
       </section>
       <section className="flex w-full items-center justify-evenly py-3 border-b-1">
-        <p className="sm:hidden block"><GiHamburgerMenu className="text-2xl"/></p>
+        <p className="sm:hidden block"><GiHamburgerMenu className="text-2xl" onClick={()=>setuserNav(!userNav)}/></p>
         <p className="header-logo">FABRIQUE.CO</p>
         <ul className="sm:flex gap-5 sm hidden">
           {navLinks.map((link, index) => (
@@ -34,7 +36,7 @@ const UserNav = () => {
           
         </div>
         <ul className="flex gap-4 items-center">
-          <li><FiSearch className="text-2xl sm:hidden "/></li>
+          <li><FiSearch className="text-2xl sm:hidden " onClick={()=>setuserNav(!userNav)}/></li>
           <li className="flex relative"><MdOutlineShoppingBag className="text-2xl"/><span className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
       {4}
     </span></li>

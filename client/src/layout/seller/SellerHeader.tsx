@@ -3,6 +3,7 @@ import { GiHamburgerMenu } from "react-icons/gi"
 import { IoMdContact } from "react-icons/io"
 import { MdOutlineShoppingBag } from "react-icons/md"
 import { Link } from "react-router-dom"
+import { useNavContext } from "../../context/NavContext"
 
 const navLinks = [
   { name: "Dashboard", path: "/store" },
@@ -12,10 +13,14 @@ const navLinks = [
   { name: "Chats", path: "/chats" },
 ];
 const SellerHeader = () => {
+        const {sellerNav,setsellerNav} = useNavContext()
+  
   return (
     <nav className="w-100dvw">
           
           <section className="flex w-full items-center justify-evenly py-3 border-b-1">
+                    <p className="sm:hidden block"><GiHamburgerMenu className="text-2xl" onClick={()=>setsellerNav(!sellerNav)}/></p>
+
             <p className="header-logo flex items-center gap-2">FABRIQUE.CO <span className="text-xl rounded-full px-1 bg-black text-white ">Seller</span></p>
             <ul className="sm:flex gap-5 sm hidden">
               {navLinks.map((link, index) => (

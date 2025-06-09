@@ -81,7 +81,7 @@ function ProductView() {
             <section className="w-full px-4 sm:px-12 py-8">
                 <h2 className="text-2xl font-semibold mb-4">Customer Reviews</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-4">
-                    <ReviewCard />
+                    <ReviewCard  />
                    
                 </div>
             </section>
