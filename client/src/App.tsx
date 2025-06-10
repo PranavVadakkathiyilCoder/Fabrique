@@ -21,12 +21,18 @@ import LayoutAdmin from './layout/admin/LayoutAdmin'
 import NotFound from './pages/NotFound'
 import { Auth } from './pages/Auth'
 import ProtectedRoute from './components/ProtectedRoute'
+import {Toaster} from 'react-hot-toast'
+import PublicRoute from './components/PublicRoute'
+import AddProduct from './components/seller/AddProduct'
 const App = () => {
   return (
     <>
-
+      <Toaster/>
       <Routes>
-        <Route path="/auth" element={<Auth/>} />
+        <Route element={<PublicRoute/>}>
+          <Route path="/auth" element={<Auth/>} />
+        </Route>
+        
         {/* USER ROUTES */}
         <Route element={<ProtectedRoute allowedRoles={['user']} />}>
         <Route element={<LayoutUser />}>
@@ -47,6 +53,9 @@ const App = () => {
           <Route path="/orders" element={<Order />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/chats" element={<Chats />} />
+          <Route path="/addproduct" element={<AddProduct />} />
+          
+
         </Route>
         </Route>
         {/* ADMIN ROUTES */}

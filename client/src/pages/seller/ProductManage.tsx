@@ -1,13 +1,14 @@
 import React from 'react';
 import shirt from '../../assets/shirt.png';
 import { IoMdAdd } from 'react-icons/io'
-
+import { useNavigate } from 'react-router-dom';
 const ProductManage: React.FC = () => {
+  const navigate = useNavigate()
   return (
     <div className="w-full p-4">
       <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
     <div>
-        <button className='flex gap-3 px-6 py-1 m-1 bg-black text-white rounded-sm'>Add Product<IoMdAdd className='text-2xl '/></button>
+        <button onClick={()=>navigate('/addproduct')} className='flex gap-3 px-6 py-1 m-1 bg-black text-white rounded-sm'>Add Product<IoMdAdd className='text-2xl '/></button>
     </div>
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse border border-gray-300 text-left">

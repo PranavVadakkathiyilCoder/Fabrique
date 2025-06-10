@@ -5,8 +5,8 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-  const token = localStorage.getItem('token') || "12"
-  const userRole = localStorage.getItem('role') || "user" || "admin" || "seller"
+  const token = localStorage.getItem('token') 
+  const userRole = localStorage.getItem('role') 
 
   
   if (!token) {
@@ -14,10 +14,10 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   }
 
  
-  if (!allowedRoles.includes(userRole || 'user')) {
+  if (!allowedRoles.includes(userRole || '')) {
     return <Navigate to="/auth" replace />
   }
-
+   
   
   return <Outlet />
 }

@@ -1,8 +1,8 @@
 import toast from "react-hot-toast"
 import { Loader2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
-//import { loginUser, registerUser } from "@/apis/Authapi"
+import {  useState } from "react"
+import { loginUser, registerUser } from "../apis/authapi"
 
 export function Auth() {
   const [Login, setLogin] = useState(true)
@@ -41,32 +41,47 @@ export function Auth() {
 
     setLoading(true)
 
-    //try {
-    //  if (Login) {
-    //    const res = await loginUser({ email, password })
-    //    if (res.data.success) {
-    //      successmsg(res.data.message)
-    //      localStorage.setItem("token", res.data.token)
-    //      navigate("/Home")
-    //    } else {
-    //      errmsg(res.data.message)
-    //    }
-    //  } else {
-    //    const res = await registerUser(Formdata)
-    //    if (res.data.success) {
-    //      successmsg(res.data.message)
-    //      localStorage.setItem("token", res.data.token)
-    //      navigate("/Home")
-    //    } else {
-    //      errmsg(res.data.message)
-    //    }
-    //  }
-    //} catch (error) {
-    //  console.error("Frontend Error:", error)
-    //  toast.error("Something went wrong")
-    //} finally {
-    //  setLoading(false)
-    //}
+    try {
+      if (Login) {
+        const res = await loginUser({ email, password })
+        console.log(res);
+        
+        if (res.data.success) {
+          successmsg(res.data.message)
+          localStorage.setItem("token", res.data.token)
+          localStorage.setItem("role", res.data.role)
+          const role = res.data.role;
+        if (role === "admin") navigate("/admin");
+        else if (role === "seller") navigate("/store");
+        else if (role === "user") navigate("/");
+          
+        } else {
+          errmsg(res.data.message)
+        }
+      } else {
+        const res = await registerUser(Formdata)
+        if (res.data.success) {
+          successmsg(res.data.message)
+          
+          localStorage.setItem("token", res.data.token)
+          localStorage.setItem("role", res.data.role)
+          const role = res.data.role;
+           if (role === "admin") navigate("/admin");
+        else if (role === "seller") navigate("/store");
+        else if (role === "user") navigate("/");
+          
+        } else {
+          errmsg(res.data.message)
+        }
+      }
+    } catch (error) {
+      console.error("Frontend Error:", error)
+      toast.error("Something went wrong")
+    } finally {
+      setLoading(false)
+    }
+    
+    
   }
 
   return (
