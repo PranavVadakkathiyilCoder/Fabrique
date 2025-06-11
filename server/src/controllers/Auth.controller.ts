@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/User.model";
 import { uploadToCloudinary } from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
+
 interface AuhtRequest extends Request {
   user_info?: any;
 }
@@ -11,8 +12,8 @@ const AccessandRefreshToken = async (
   try {
     const user = await User.findById(userId);
 
-    const accesstoken = await user.AccessToken();
-    const refreshtoken = await user.RefreshToken();
+    const accesstoken =  user.AccessToken();
+    const refreshtoken =  user.RefreshToken();
     user.refreshToken = refreshtoken;
     await user.save();
     return { accesstoken, refreshtoken };
@@ -93,7 +94,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     };
     const { accesstoken, refreshtoken } = await AccessandRefreshToken(user._id);
 
-    res.status(201).cookie("accesstoken", accesstoken, option).json({
+    res.status(201).cookie("accesstoken", accesstoken, option).cookie("refresh", refreshtoken, option).json({
       success: true,
 
       message: "Login Successfully",
@@ -129,6 +130,25 @@ const LogOut = async (req: AuhtRequest, res: Response) => {
   }
 };
 
+//const validate = async (req: Request, res: Response) => {
+//  const token = req.cookies.accesstoken
+//  if (!token) { res.status(401).json({ message: 'Unauthorized' })
+//    return
+//  }
+//    const user = await User.findOne() // You may need user to check role/email match
+
+//  if (!user) { res.status(401).json({ message: 'User not found' })
+//    return
+//  }
+
+//  const result = user.validateToken(token)
+//  if(!result.valid){
+//    res.status(401).json({ message: result.error})
+//  }
+   
+//  res.status(200).json({ message: "validuser"})
+
+//}
 const getAllUsers = async (req: AuhtRequest, res: Response) => {
   const { search } = req.query;
   const SearchResult = search

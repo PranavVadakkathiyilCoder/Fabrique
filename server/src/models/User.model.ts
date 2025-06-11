@@ -83,7 +83,17 @@ userSchema.methods.RefreshToken = function () {
         { expiresIn: JWTR_EXPIRE } as SignOptions // ✅ Correct: JWTR_EXPIRE
     );
 };
+userSchema.methods.validateToken = function (token: string): { valid: boolean, decoded?: any, error?: string } {
+    
+ try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+    return { valid: true, decoded }
+  } catch (err: any) {
+    return { valid: false, error: err.message }
+  }
 
+   
+}
 const User = models?.User || model<Iuser>("User", userSchema);
 
 export default User;

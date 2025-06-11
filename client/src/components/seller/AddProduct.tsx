@@ -1,13 +1,33 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-
+import { AddProducts } from '../../apis/productapi';
+import { useNavigate } from 'react-router-dom';
+import toast from "react-hot-toast"
+import { Loader2 } from "lucide-react"
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>('');
+  const [price, setPrice] = useState<number|string>("");
+  const [oldprice, setoldprice] = useState<number|string>("");
   const [description, setDescription] = useState<string>('');
   const [images, setImages] = useState<File[]>([]);
   const [colors, setColors] = useState<string[]>(['']);
   const [sizes, setSizes] = useState<string[]>(['']);
-  const [totalStock, setTotalStock] = useState<number>(1);
+  const [totalStock, setTotalStock] = useState<number|string>("");
   const [error, setError] = useState<string>('');
+    const [onLoading, setLoading] = useState(false)
+    const navigate = useNavigate()
+  const successmsg = (msg: string) => {
+    toast.success(msg, {
+      icon: "👏",
+      style: { backgroundColor: "black", color: "white" },
+    })
+  }
+
+  const errmsg = (msg: string) => {
+    toast.error(msg, {
+      icon: "🔥",
+      style: { backgroundColor: "#d00000", color: "white" },
+    })
+  }
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -32,7 +52,7 @@ const AddProduct: React.FC = () => {
 
   
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async(e: FormEvent) => {
     e.preventDefault();
 
     if (images.length !== 4) {
@@ -42,6 +62,8 @@ const AddProduct: React.FC = () => {
 
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('price', price.toString());
+formData.append('oldprice', oldprice.toString());
     formData.append('description', description);
     images.forEach((image) => {
       formData.append('images', image);
@@ -53,6 +75,25 @@ const AddProduct: React.FC = () => {
       formData.append('sizes', size);
     });
     formData.append('totalStock', totalStock.toString());
+    setLoading(true)
+    try {
+      
+      const res = await AddProducts(formData)
+      console.log(res);
+      if(res.data.success){
+        setLoading(false)
+        successmsg(res.data.message)
+        navigate('/manageproduct')
+
+      }
+
+      
+    } catch (error) {
+      console.log("Error on AddProduct",error);
+      setLoading(false)
+      errmsg("Error Try Again")
+    }
+
 
     console.log('Submitting product', {
       name,
@@ -90,6 +131,26 @@ const AddProduct: React.FC = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            className="w-full border rounded px-3 py-2 focus:ring focus:ring-black/30 focus:outline-none"
+            required
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Product Price</label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="w-full border rounded px-3 py-2 focus:ring focus:ring-black/30 focus:outline-none"
+            required
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Product Old Price</label>
+          <input
+            type="text"
+            value={oldprice}
+            onChange={(e) => setoldprice(e.target.value)}
             className="w-full border rounded px-3 py-2 focus:ring focus:ring-black/30 focus:outline-none"
             required
           />
@@ -205,11 +266,16 @@ const AddProduct: React.FC = () => {
         {/* Submit button */}
         <div>
           <button
-            type="submit"
-            className="w-full bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition text-lg font-medium"
-          >
-            Submit Product
-          </button>
+              disabled={onLoading}
+              type="submit"
+              className={`w-full flex justify-center items-center bg-black text-white py-2 rounded text-sm hover:bg-gray-900 transition ${
+                onLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+            >
+              {onLoading ? (
+                <Loader2 className="animate-spin w-5 h-5" />
+              ) : "Submit Product"}
+            </button>
         </div>
       </form>
     </section>

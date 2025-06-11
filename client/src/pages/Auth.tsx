@@ -44,7 +44,7 @@ export function Auth() {
     try {
       if (Login) {
         const res = await loginUser({ email, password })
-        console.log(res);
+        //console.log(res);
         
         if (res.data.success) {
           successmsg(res.data.message)
@@ -79,7 +79,7 @@ export function Auth() {
       toast.error("Something went wrong")
     } finally {
       setLoading(false)
-    }
+    } 
     
     
   }
