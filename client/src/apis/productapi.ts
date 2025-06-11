@@ -6,6 +6,12 @@ import axios from "./axios";
     return axios.post('/produts',data)
 }
 const GetSellerProduct = async () => {
-    return axios.post('/sellerproduct')
+    return axios.get('/product/sellerproduct')
 }
-export {AddProducts,GetAllProduct,GetSellerProduct}
+const TopSellingProduct = async () => {
+    return axios.get('/product/topselling')
+}
+const NewArrivelsProduct = async () => {
+    return axios.get('/product/newarrivel')
+}
+export {AddProducts,GetAllProduct,GetSellerProduct,TopSellingProduct,NewArrivelsProduct}

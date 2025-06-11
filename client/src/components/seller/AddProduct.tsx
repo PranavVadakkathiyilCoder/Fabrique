@@ -13,6 +13,18 @@ const AddProduct: React.FC = () => {
   const [sizes, setSizes] = useState<string[]>(['']);
   const [totalStock, setTotalStock] = useState<number|string>("");
   const [error, setError] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
+  const categories = [
+  { data: "T-Shirts" },
+  { data: "Shirts" },
+  { data: "Jeans" } , { data: "Trousers" },
+  { data: "Innerwear"  },
+  { data: "Footwear" },
+  { data: "Accessories" },
+  { data: "Huddy"},   { data: "Jackets" },
+  { data: "NewArrivels"},   { data: "TopSelling" },
+  { data: "Kurta"} ];
+
     const [onLoading, setLoading] = useState(false)
     const navigate = useNavigate()
   const successmsg = (msg: string) => {
@@ -68,6 +80,8 @@ formData.append('oldprice', oldprice.toString());
     images.forEach((image) => {
       formData.append('images', image);
     });
+    formData.append('category', category);
+
     colors.forEach((color) => {
       formData.append('colors', color);
     });
@@ -112,6 +126,7 @@ formData.append('oldprice', oldprice.toString());
     setSizes(['']);
     setTotalStock(0);
     setError('');
+    setCategory('')
   };
 
   return (
@@ -148,7 +163,7 @@ formData.append('oldprice', oldprice.toString());
         <div>
           <label className="block font-medium mb-1">Product Old Price</label>
           <input
-            type="text"
+            type="number"
             value={oldprice}
             onChange={(e) => setoldprice(e.target.value)}
             className="w-full border rounded px-3 py-2 focus:ring focus:ring-black/30 focus:outline-none"
@@ -212,6 +227,21 @@ formData.append('oldprice', oldprice.toString());
             ))}
           </div>
         </div>
+          {/*category*/}
+          <div>
+  <label className="block font-medium mb-1">Category</label>
+  <select
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+    className="w-full border rounded px-3 py-2 focus:ring focus:ring-black/30 focus:outline-none"
+    required
+  >
+    <option value="" className='bg-black text-white'>Select a category</option>
+    {categories.map((cat, index) => (
+      <option  key={index} value={cat.data}>{cat.data}</option>
+    ))}
+  </select>
+</div>
 
         {/* Colors */}
         <div>

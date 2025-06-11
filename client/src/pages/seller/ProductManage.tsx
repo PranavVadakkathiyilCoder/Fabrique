@@ -1,9 +1,37 @@
-import React from 'react';
-import shirt from '../../assets/shirt.png';
+import React, { useEffect, useState } from 'react';
 import { IoMdAdd } from 'react-icons/io'
 import { useNavigate } from 'react-router-dom';
+import { GetSellerProduct } from '../../apis/productapi';
+interface Product {
+  _id: string;
+  name: string;
+  images: string[];
+  colors: string[];
+  sizes: string[];
+  totalStock: number;
+}
 const ProductManage: React.FC = () => {
   const navigate = useNavigate()
+  const [products, setproducts] = useState<Product[]>([])
+  useEffect(() => {
+    const loadproduct = async()=>{
+      try {
+        const data = await GetSellerProduct()
+      console.log(data.data);
+      const Products = data.data.products
+      setproducts(Products)
+      } catch (err) {
+        console.log(err);
+        
+      }
+      
+    }
+    loadproduct()
+    
+    
+  }, [])
+  
+
   return (
     <div className="w-full p-4">
       <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
@@ -23,34 +51,48 @@ const ProductManage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          <tr className="hover:bg-gray-50">
-            <td className="border border-gray-300 px-4 py-2 align-top">Classic White Shirt</td>
-            <td className=" border-gray-300 px-4 py-2 flex gap-2 ">
-              <img
-                src={shirt}
-                alt="Classic White Shirt image 1"
-                className="w-12 h-12 object-cover rounded bg-gray-200 p-1"
-              />
-            </td>
-            <td className="border border-gray-300 px-4 py-2 align-top">White, Black</td>
-            <td className="border border-gray-300 px-4 py-2 align-top">S, M, L, XL</td>
-            <td className="border border-gray-300 px-4 py-2 align-top">120</td>
-            <td className="border border-gray-300 px-4 py-2 align-top space-x-2">
-              <button
-                className="bg-black hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
-                onClick={() => alert('Edit Classic White Shirt')}
-              >
-                Edit
-              </button>
-              <button
-                className="bg-black hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
-                onClick={() => alert('Delete Classic White Shirt')}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
+
+          {products.map((product) => (
+              <tr className="hover:bg-gray-50" key={product._id}>
+                <td className="border border-gray-300 px-4 py-2 align-top">{product.name}</td>
+                <td className="border  border-gray-300 px-4 py-2 flex flex-wrap gap-2">
+                  {product.images.map((img, idx) => (
+                    
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`${product.name} image ${idx + 1}`}
+                      className="w-12 h-12 object-cover rounded bg-gray-200 p-1"
+                    />
+                  ))}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 align-top uppercase">{product.colors.join(', ')}</td>
+                <td className="border border-gray-300 px-4 py-2 align-top uppercase">{product.sizes.join(', ')}</td>
+                <td className="border border-gray-300 px-4 py-2 align-top">{product.totalStock}</td>
+                <td className="border border-gray-300 px-4 py-2  space-x-2 ">
+                  <button
+                    className="bg-black m-1 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                    onClick={() => alert(`Edit ${product.name}`)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-black m-1 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                    onClick={() => alert(`Delete ${product.name}`)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {products.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center py-4 text-gray-500">
+                  No products found.
+                </td>
+              </tr>
+            )}
+          </tbody>
       </table>
     </div>
     </div>

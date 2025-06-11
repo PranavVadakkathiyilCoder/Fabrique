@@ -11,11 +11,10 @@ const categories = [
     { data: "Innerwear", Link: "innerwear" },
     { data: "Footwear", Link: "footwear" },
     { data: "Accessories", Link: "accessories" },
-    { data: "Top Selling", Link: "top-selling" },
-    { data: "New Arrivals", Link: "new-arrivals" },
-    { data: "Casual", Link: "casual" },
-    { data: "Formal", Link: "formal" },
-    { data: "Party", Link: "party" },
+    { data: "Huddy", Link: "huddy" },
+    { data: "Jackets", Link: "jackets" },
+    { data: "Kurta", Link: "kurta" },
+    
     
 ];
 

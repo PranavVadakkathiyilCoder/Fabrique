@@ -1,13 +1,30 @@
+import { useEffect, useState } from 'react'
 import ProductCard from './ProductCard'
+import { NewArrivelsProduct } from '../../apis/productapi'
 
 const NewArrivels = () => {
+  const [products, setproducts] = useState([])
+  useEffect(() => {
+    const getProduct = async()=>{
+      try {
+        const data = await NewArrivelsProduct()
+      console.log(data);
+      } catch (error) {
+        console.log(error);
+        
+      }
+      
+
+    }
+    getProduct()
+  }, [])
   return (
     <section className='text-center'>
-      <p className='font-text text-2xl'>NEW ARRIVELS</p>
-      <div className='grid sm:grid-cols-4 grid-cols-1 m-4 gap-20'>
+      <p className='font-text text-2xl m-3'>NEW ARRIVELS</p>
+      <div className='grid sm:grid-cols-4 grid-cols-1 mx-4 gap-12'>
         <ProductCard />
         <ProductCard />
-        <ProductCard />
+        <ProductCard /> 
         <ProductCard />
         
 
