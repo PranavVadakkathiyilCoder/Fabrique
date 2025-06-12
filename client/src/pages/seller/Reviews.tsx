@@ -40,7 +40,7 @@ import ReviewCard from '../../components/ReviewCard'
 const Reviews = () => {
   return (
     <div className="w-full p-4">
-      <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+      <h2 className="font-text text-3xl sm:text-4xl font-semibold tracking-wide">Customer Reviews</h2>
 
       {reviewsData.map((review, index) => (
         <ReviewCard

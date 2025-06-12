@@ -68,7 +68,7 @@ const AddProducts = async (req: AuhtRequest, res: Response) => {
 const getSellerProducts = async (req: AuhtRequest, res: Response) => {
   try {
     const seller_id = req.user_info._id;
-    const products = await Product.find({ seller: seller_id })
+    const products = await Product.find({ seller: seller_id });
     //.populate(
     //  "seller",
     //  "name email pic"
@@ -90,52 +90,128 @@ const getSellerProducts = async (req: AuhtRequest, res: Response) => {
   }
 };
 
-const NewArrivels = async(req: AuhtRequest, res: Response)=>{
+const NewArrivels = async (req: AuhtRequest, res: Response) => {
   try {
-    
     const products = await Product.aggregate([
-  { $match: { category: "NewArrivels" } }, 
-  { $limit: 4 }                            
-]);
-    if(!products){
-      res.status(400).json({success:false,message:"Not Such Category"})
-      return
+      { $match: { category: "NewArrivels" } },
+      { $limit: 4 },
+    ]);
+    if (!products) {
+      res.status(400).json({ success: false, message: "Not Such Category" });
+      return;
     }
     res.status(200).json({
-      success:true,message:"NewArrivels Fetched",products
-
-    })
+      success: true,
+      message: "NewArrivels Fetched",
+      products,
+    });
   } catch (error) {
     console.log(error);
-    
-    res.status(500).json({
-      success:false,message:"error on server",
 
-    })
+    res.status(500).json({
+      success: false,
+      message: "error on server",
+    });
   }
-    
-}
-const TopSelling = async(req: AuhtRequest, res: Response)=>{
-    try {
-const products = await Product.aggregate([
-  { $match: { category: "TopSelling" } },
-  { $limit: 4 }                           
-]);    if(!products){
-      res.status(400).json({success:false,message:"Not Such Category"})
-      return
+};
+const TopSelling = async (req: AuhtRequest, res: Response) => {
+  try {
+    const products = await Product.aggregate([
+      { $match: { category: "TopSelling" } },
+      { $limit: 4 },
+    ]);
+    if (!products) {
+      res.status(400).json({ success: false, message: "Not Such Category" });
+      return;
     }
     res.status(200).json({
-      success:true,message:"TopSellings Fetched",products
-
-    })
+      success: true,
+      message: "TopSellings Fetched",
+      products,
+    });
   } catch (error) {
     console.log(error);
-    
+
     res.status(500).json({
-      success:false,message:"error on server",
-
-    })
+      success: false,
+      message: "error on server",
+    });
   }
-}
+};
 
-export { AddProducts, getSellerProducts,NewArrivels, TopSelling};
+const Accessories = async (req: AuhtRequest, res: Response) => {
+  try {
+    const products = await Product.find({
+      category: { $in: ["Footwear", "Accessories"] },
+    }).limit(4);
+    if (!products) {
+      res.status(400).json({ success: false, message: "Not Such Accessories" });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      message: "Accessories Fetched",
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "error on server",
+    });
+  }
+};
+const AllProducts = async (req: AuhtRequest, res: Response) => {
+  try {
+    const products = await Product.find({});
+    if (!products) {
+      res.status(400).json({ success: false, message: "Not Products" });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      message: "Products Fetched",
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "error on server",
+    });
+  }
+};
+const SingleProduct = async (req: AuhtRequest, res: Response) => {
+  try {
+    const product_id = req.query.id;
+    const product = await Product.findById(product_id);
+    if (!product) {
+      res.status(400).json({ success: false, message: "Not Product" });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      message: "Product Fetched",
+      product,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "error on server",
+    });
+  }
+};
+
+export {
+  AddProducts,
+  getSellerProducts,
+  NewArrivels,
+  TopSelling,
+  Accessories,
+  AllProducts,
+  SingleProduct,
+};

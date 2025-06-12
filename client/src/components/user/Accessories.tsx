@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react"
-import ProductCard from "./ProductCard"
-import { TopSellingProduct } from "../../apis/productapi"
+import { useEffect, useState } from 'react'
+import ProductCard from './ProductCard'
+import { GetAccessories } from '../../apis/productapi'
 import ProductCardLoading from '../Loading/ProductCardLoading'
-
 interface Product {
   _id: string;
   name: string;
@@ -11,14 +10,14 @@ interface Product {
   description: string;
   images: string[];
 }
-const TopSelling = () => {
+const Accessories = () => {
   const [products, setproducts] = useState<Product[]>([])
-      const [loading, setLoading] = useState(true)
-  
+    const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     const getProduct = async()=>{
       try {
-        const data = await TopSellingProduct()
+        const data = await GetAccessories()
       console.log(data);
       setproducts(data.data.products)
       } catch (error) {
@@ -33,10 +32,9 @@ const TopSelling = () => {
     }
     getProduct()
   }, [])
-  
   return (
     <section className="text-center px-4 sm:px-12 py-8 space-y-8">
-  <p className="font-text text-3xl sm:text-4xl font-semibold tracking-wide">TOP SELLING</p>
+  <p className="font-text text-3xl sm:text-4xl font-semibold tracking-wide">ACCESSORIES</p>
 
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
     {loading
@@ -51,6 +49,7 @@ const TopSelling = () => {
                 image={product.images[0]}
               />
             ))}
+            
   </div>
 
   <div className="pt-6">
@@ -65,4 +64,4 @@ const TopSelling = () => {
   )
 }
 
-export default TopSelling
+export default Accessories
