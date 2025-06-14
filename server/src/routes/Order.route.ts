@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createOrderCOD,getCartTotalAmount,createOrderRazorpay, verifyRazorpayPayment, getUserOrders, getSellerOrders } from "../controllers/Order.controller";
+import { createOrderCOD,getCartTotalAmount,createOrderRazorpay, verifyRazorpayPayment, getUserOrders, getSellerOrders, updateOrderItemStatus } from "../controllers/Order.controller";
 import verifyUser from "../middleware/VerifyUser";
 const router = Router()
 
@@ -12,6 +12,7 @@ router.route('/verify-razorpay').post(verifyUser,verifyRazorpayPayment)
 router.route('/getuserorder').get(verifyUser,getUserOrders)
 router.route('/getsellerorder').get(verifyUser,getSellerOrders)
 
+router.route('/updateorderstatus').put(verifyUser,updateOrderItemStatus)
 
 
 

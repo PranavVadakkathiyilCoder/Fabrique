@@ -344,7 +344,7 @@ const getSellerOrders = async (req: AuthRequest, res: Response) => {
       "items.seller": sellerId,
     }).sort({ createdAt: -1 });
 
-    console.log(`Found ${orders.length} orders for seller ${sellerId}`);
+    //console.log(`Found ${orders.length} orders for seller ${sellerId}`);
 
     const sellerOrders = orders
       .map((order: IOrder) => {
@@ -383,6 +383,62 @@ const getSellerOrders = async (req: AuthRequest, res: Response) => {
 };
 
 
+ const updateOrderItemStatus = async (req: Request, res: Response) => {
+  try {
+    
+    const { orderId,productId, sellerId, status } = req.body;
+
+    const validStatuses = [
+      'Pending',
+      'Confirmed',
+      'Dispatched',
+      'In Transit',
+      'Out for Delivery',
+      'Delivered',
+    ];
+
+    if (!validStatuses.includes(status)) {
+       res.status(400).json({ message: 'Invalid status value' }); return
+    }
+
+    const updatedOrder = await Order.findOneAndUpdate(
+      {
+        _id: orderId,
+        'items.product': productId,
+        'items.seller': sellerId,
+      },
+      {
+        $set: {
+          'items.$[elem].Orderstatus': status,
+        },
+      },
+      {
+        new: true,
+        arrayFilters: [
+          {
+            'elem.product': productId,
+            'elem.seller': sellerId,
+          },
+        ],
+      }
+    );
+
+    if (!updatedOrder) {
+       res.status(404).json({ message: 'Order or item not found' }); return
+    }
+
+     res.status(200).json({
+      success:true,
+      message: 'Order status updated successfully',
+      updatedOrder,
+    });
+  } catch (error) {
+    console.error('Order status update error:', error);
+     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
 
 export {
   createOrderCOD,
@@ -390,5 +446,6 @@ export {
   verifyRazorpayPayment,
   getCartTotalAmount,
   getUserOrders,
-  getSellerOrders
+  getSellerOrders,
+  updateOrderItemStatus
 };

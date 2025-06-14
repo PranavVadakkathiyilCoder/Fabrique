@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { GetSellerOrder } from '../../apis/order';
+import { GetSellerOrder, UpdateOrderStatus } from '../../apis/order';
 import {
   FaMapMarkerAlt,
   FaPhoneAlt,
@@ -7,7 +7,9 @@ import {
   FaRupeeSign,
   FaCalendarAlt,
   FaCheckCircle,
+  FaPrint,
 } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 interface OrderItem {
   name: string;
@@ -19,6 +21,8 @@ interface OrderItem {
   productcount: number;
   Orderstatus: string;
   image: string;
+  product: string;
+  seller: string;
 }
 
 interface OrderType {
@@ -39,18 +43,78 @@ interface OrderType {
 const Order = () => {
   const [orders, setOrders] = useState<OrderType[]>([]);
 
+  const getAllOrders = async () => {
+    try {
+      const res = await GetSellerOrder();
+      setOrders(res.data);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  };
+
   useEffect(() => {
-    const getAllOrders = async () => {
-      try {
-        const res = await GetSellerOrder();
-        setOrders(res.data);
-        console.log(res.data);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    };
     getAllOrders();
   }, []);
+
+  const orderStatusHandler = async ({
+    orderId,
+    productId,
+    sellerId,
+    newStatus,
+  }: {
+    orderId: string;
+    productId: string;
+    sellerId: string;
+    newStatus: string;
+  }) => {
+    try {
+      const res = await UpdateOrderStatus({
+        orderId,
+        productId,
+        sellerId,
+        status: newStatus,
+      });
+
+      if (res.data.success) {
+        toast.success('Order status updated!');
+        await getAllOrders();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update order status');
+    }
+  };
+
+  const printOrderDetails = (order: OrderType, item: OrderItem) => {
+    const printContent = `
+Order ID: ${order._id}
+Date: ${new Date(order.createdAt).toLocaleString('en-IN')}
+----------------------------------------
+Product: ${item.name}
+Size: ${item.size}
+Color: ${item.color}
+Quantity: ${item.productcount}
+Price: ₹${item.amount}
+Payment Mode: ${item.paymentMode}
+Payment Status: ${item.paymentStatus}
+Order Status: ${item.Orderstatus}
+----------------------------------------
+Shipping To:
+${order.name}
+${order.address}
+Pincode: ${order.pincode}
+Phone: ${order.phone}
+----------------------------------------
+Total: ₹${order.totalAmount}
+`;
+
+    const newWindow = window.open('', '_blank', 'width=600,height=800');
+    if (newWindow) {
+      newWindow.document.write(`<pre style="font-family: monospace; padding: 20px;">${printContent}</pre>`);
+      newWindow.document.close();
+      newWindow.print();
+    }
+  };
 
   return (
     <div className="w-full px-4 py-10 bg-gradient-to-b from-gray-50 to-white min-h-screen">
@@ -66,7 +130,7 @@ const Order = () => {
               className="bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-lg transition duration-300 p-6 grid grid-cols-1 md:grid-cols-12 gap-6"
             >
               {/* Product Image */}
-              <div className="md:col-span-2 h-36 md:h-full overflow-hidden rounded-xl border">
+              <div className="md:col-span-2 sm:h-36 md:h-full overflow-hidden rounded-xl border">
                 <img
                   src={item.image}
                   alt={item.name}
@@ -113,8 +177,17 @@ const Order = () => {
                     })}
                   </div>
                   <div className="flex items-center gap-1">
-                    <FaCheckCircle className="text-green-500" />
-                    <span className="font-semibold text-green-700">{item.Orderstatus}</span>
+                    {item.Orderstatus === 'Pending' ? (
+                      <>
+                        <span className="text-red-500">❌</span>
+                        <span className="font-semibold text-red-600">{item.Orderstatus}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaCheckCircle className="text-green-500" />
+                        <span className="font-semibold text-green-700">{item.Orderstatus}</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -132,13 +205,24 @@ const Order = () => {
                 </div>
 
                 <div>
-                  <label htmlFor={`status-${order._id}-${idx}`} className="block text-sm font-semibold mb-1">
+                  <label
+                    htmlFor={`status-${order._id}-${idx}`}
+                    className="block text-sm font-semibold mb-1"
+                  >
                     Update Order Status
                   </label>
                   <select
                     id={`status-${order._id}-${idx}`}
                     defaultValue={item.Orderstatus}
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+                    onChange={(e) =>
+                      orderStatusHandler({
+                        orderId: order._id,
+                        productId: item.product,
+                        sellerId: item.seller,
+                        newStatus: e.target.value,
+                      })
+                    }
                   >
                     <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>
@@ -147,6 +231,19 @@ const Order = () => {
                     <option value="Out for Delivery">Out for Delivery</option>
                     <option value="Delivered">Delivered</option>
                   </select>
+
+                  {/* Print Button */}
+                  <button
+                    onClick={() => printOrderDetails(order, item)}
+                    disabled={item.Orderstatus === 'Pending'}
+                    className={`mt-4 inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition
+    ${item.Orderstatus === 'Pending'
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-black text-white hover:bg-gray-800'}`}
+                  >
+                    <FaPrint className="mr-2" />
+                    Print Details
+                  </button>
                 </div>
               </div>
             </div>
