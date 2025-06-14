@@ -22,7 +22,7 @@ const NavBarMobile = () => {
       const {userNav,setuserNav} = useNavContext()
     
     return (
-        <div className={`${userNav ? "fixed" : "hidden"}  top-0 left-0 w-full h-100dvh bg-white z-9999`}>
+        <div className={`${userNav ? "fixed" : "hidden"}  top-0 left-0 w-full h-screen bg-white z-9999`}>
             <section className="flex items-center justify-between w-full p-4">
                 <p className="header-logo">FABRIQUE.CO</p>
                 <p><IoClose className="text-3xl" onClick={()=>setuserNav(!userNav)}/></p>

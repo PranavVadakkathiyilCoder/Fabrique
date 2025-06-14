@@ -53,6 +53,9 @@ const Order = () => {
                   <option value="dispatched">Dispatched</option>
                   <option value="intransit">In Transit</option>
                   <option value="outForDelivery">Out for Delivery</option>
+                  <option value="outForDelivery">Delivered</option>
+
+                  
                 </select>
               </div>
 

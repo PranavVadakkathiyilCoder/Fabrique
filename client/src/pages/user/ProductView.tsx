@@ -7,7 +7,11 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { GetSingleProduct } from "../../apis/productapi";
 import ProductViewLoading from "../../components/Loading/ProductViewLoading";
+import toast from "react-hot-toast"
+import { Loader2 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
+import { AddToCart } from "../../apis/cartapi";
 interface Product {
     _id: string;
     name: string;
@@ -23,10 +27,27 @@ function ProductView() {
     const [product, setproduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [productcount, setproductcount] = useState<number>(1)
-    
+    const [color, setcolor] = useState<string>("")
+    const [size, setsize] = useState<string>('')
 
+    const navigate = useNavigate()
     const { product_id } = useParams<{ product_id: string }>();
     const maxorder = 5
+
+    const successmsg = (msg: string) => {
+        toast.success(msg, {
+            icon: "👏",
+            style: { backgroundColor: "black", color: "white" },
+        })
+    }
+
+    const errmsg = (msg: string) => {
+        toast.error(msg, {
+            icon: "🔥",
+            style: { backgroundColor: "#d00000", color: "white" },
+        })
+    }
+
 
     useEffect(() => {
         const getProduct = async () => {
@@ -41,7 +62,39 @@ function ProductView() {
         };
         getProduct();
     }, [product_id]);
-    
+
+    const handleAddtoCart = async () => {
+
+        if (!product) return;
+        if (!size) errmsg("Please add size")
+        if (!color) errmsg("Please add color")
+        const payload = {
+            product_id: product._id,
+            size,
+            color,
+            count: productcount,
+            amount: product.price,
+        };
+        try {
+            const data = await AddToCart(payload)
+            console.log(data.data);
+            if(data.data.success){
+                successmsg(data.data.message)
+                navigate('/cart')
+
+            }
+            else{
+                errmsg("Try Again Later")
+            }
+
+        } catch (error) {
+            
+                console.log("addtocarterror",error);
+                
+        }
+
+
+    }
 
     if (loading || !product) return <ProductViewLoading />;
 
@@ -98,7 +151,8 @@ function ProductView() {
                                     className="w-8 h-8 border rounded-full"
                                     style={{ backgroundColor: color, opacity: 0.5 }}
                                     title={color}
-                                        
+                                    onClick={() => setcolor(color)}
+
                                 />
                             ))}
                         </div>
@@ -108,8 +162,9 @@ function ProductView() {
                         <p className="font-medium">Select Size</p>
                         <div className="flex gap-3 py-2">
                             {product.sizes.map((size) => (
-                                <p key={size} className="px-4 py-2 border rounded-sm uppercase">
+                                <p key={size} onClick={() => setsize(size)} className="px-4 py-2 border rounded-sm uppercase">
                                     {size}
+
                                 </p>
                             ))}
                         </div>
@@ -118,11 +173,11 @@ function ProductView() {
                     {/* Quantity + Add to Cart */}
                     <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4 mt-4">
                         <div className="flex w-full sm:w-1/3">
-                            <button onClick={()=>setproductcount(prev => Math.max(1, prev - 1))} className="bg-gray-300 px-4 py-2 rounded-l-xl w-1/3">-</button>
+                            <button onClick={() => setproductcount(prev => Math.max(1, prev - 1))} className="bg-gray-300 px-4 py-2 rounded-l-xl w-1/3">-</button>
                             <p className="bg-gray-300 px-4 py-2 text-center w-1/3">{productcount}</p>
-                            <button onClick={()=>setproductcount(prev => Math.max(1, prev + 1))} disabled={productcount >= maxorder} className="bg-gray-300 px-4 py-2 rounded-r-xl w-1/3">+</button>
+                            <button onClick={() => setproductcount(prev => Math.max(1, prev + 1))} disabled={productcount >= maxorder} className="bg-gray-300 px-4 py-2 rounded-r-xl w-1/3">+</button>
                         </div>
-                        <button className="w-full sm:w-2/3 px-4 py-2 bg-black text-white rounded-xl">
+                        <button onClick={() => handleAddtoCart()} className="w-full sm:w-2/3 px-4 py-2 bg-black text-white rounded-xl">
                             Add to Cart
                         </button>
                     </div>
