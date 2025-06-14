@@ -1,72 +1,160 @@
-import shirt from '../../assets/shirt.png'
+import { useEffect, useState } from 'react';
+import { GetSellerOrder } from '../../apis/order';
+import {
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaBox,
+  FaRupeeSign,
+  FaCalendarAlt,
+  FaCheckCircle,
+} from 'react-icons/fa';
 
-const Order = () => {
-  return (
-    <div className="w-full p-4">
-      <h2 className="text-2xl font-bold mb-4">Orders</h2>
-      <div className="sm:w-screen min-h-screen  ">
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-          <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col sm:flex-row sm:items-center sm:gap-6 transition hover:shadow-lg">
-
-            {/* Product Image */}
-            <div className="w-20 h-20 flex-shrink-0">
-              <img src={shirt} alt="Product" className="w-full h-full object-cover rounded-md" />
-            </div>
-
-            {/* Product Info */}
-            <div className="flex-1 flex flex-col justify-center">
-              <p className="text-lg font-semibold mb-1 text-gray-900">The shirt the better shirt</p>
-              <div className="text-sm text-gray-600 leading-relaxed space-y-1">
-                <p>Size: <span className="font-medium text-black">Large</span></p>
-                <p>Qty: <span className="font-medium text-black">5</span></p>
-                <p>Color: <span className="font-medium text-black">Red</span></p>
-                <p>Payment: <span className="font-medium text-black">Cash on Delivery</span></p>
-              </div>
-            </div>
-
-            {/* Address and Status together in a column */}
-            <div className="flex flex-col gap-3 w-full sm:w-1/3 justify-center">
-
-              {/* Shipping Address */}
-              <div className="text-sm text-gray-700">
-                <p className="font-semibold mb-1 text-gray-800">Shipping Address:</p>
-                <p>John Doe</p>
-                <p>123, MG Road</p>
-                <p>Bangalore, Karnataka</p>
-                <p>PIN: 560001</p>
-                <p>📞 +91-9876543210</p>
-              </div>
-
-              {/* Order Status */}
-              <div className="">
-                <label htmlFor="orderStatus" className="block text-sm font-medium text-gray-700 mb-1">
-                  Order Status
-                </label>
-                <select
-                  id="orderStatus"
-                  name="orderStatus"
-                  className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="dispatched">Dispatched</option>
-                  <option value="intransit">In Transit</option>
-                  <option value="outForDelivery">Out for Delivery</option>
-                  <option value="outForDelivery">Delivered</option>
-
-                  
-                </select>
-              </div>
-
-            </div>
-
-          </div>
-        </section>
-
-      </div>
-    </div>
-  )
+interface OrderItem {
+  name: string;
+  size: string;
+  color: string;
+  amount: number;
+  paymentMode: string;
+  paymentStatus: string;
+  productcount: number;
+  Orderstatus: string;
+  image: string;
 }
 
-export default Order
+interface OrderType {
+  _id: string;
+  name: string;
+  address: string;
+  phone: number;
+  pincode: number;
+  user: string;
+  subtotal: number;
+  deliveryFee: number;
+  totalAmount: number;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+}
+
+const Order = () => {
+  const [orders, setOrders] = useState<OrderType[]>([]);
+
+  useEffect(() => {
+    const getAllOrders = async () => {
+      try {
+        const res = await GetSellerOrder();
+        setOrders(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+    getAllOrders();
+  }, []);
+
+  return (
+    <div className="w-full px-4 py-10 bg-gradient-to-b from-gray-50 to-white min-h-screen">
+      <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center tracking-tight">
+        🧾 Your Seller Orders
+      </h2>
+
+      <div className="space-y-8 max-w-7xl mx-auto">
+        {orders.map((order) =>
+          order.items.map((item, idx) => (
+            <div
+              key={`${order._id}-${idx}`}
+              className="bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-lg transition duration-300 p-6 grid grid-cols-1 md:grid-cols-12 gap-6"
+            >
+              {/* Product Image */}
+              <div className="md:col-span-2 h-36 md:h-full overflow-hidden rounded-xl border">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Order Info */}
+              <div className="md:col-span-6 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">{item.name}</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 text-sm text-gray-700 gap-y-1 mt-2">
+                    <p><strong>Size:</strong> {item.size}</p>
+                    <p><strong>Qty:</strong> {item.productcount}</p>
+                    <p><strong>Color:</strong> {item.color}</p>
+                    <p className="flex items-center gap-1"><FaRupeeSign /> {item.amount}</p>
+                    <p><strong>Payment:</strong> {item.paymentMode.toUpperCase()}</p>
+                    <p>
+                      <strong>Status:</strong>
+                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold 
+                        ${item.paymentStatus === 'completed'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-yellow-100 text-yellow-700'}`}>
+                        {item.paymentStatus}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Order ID + Date + Status */}
+                <div className="mt-4 flex flex-wrap items-center text-xs text-gray-500 gap-4">
+                  <div className="flex items-center gap-1">
+                    <FaBox />
+                    <span className="font-medium">Order ID:</span> {order._id}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <FaCalendarAlt />
+                    {new Date(order.createdAt).toLocaleString('en-IN', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <FaCheckCircle className="text-green-500" />
+                    <span className="font-semibold text-green-700">{item.Orderstatus}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping + Status */}
+              <div className="md:col-span-4 flex flex-col justify-between">
+                <div className="text-sm text-gray-800 mb-4">
+                  <h4 className="font-bold mb-1 flex items-center gap-1">
+                    <FaMapMarkerAlt /> Shipping Address
+                  </h4>
+                  <p>{order.name}</p>
+                  <p>{order.address}</p>
+                  <p>Pincode: {order.pincode}</p>
+                  <p className="flex items-center gap-1 mt-1"><FaPhoneAlt /> {order.phone}</p>
+                </div>
+
+                <div>
+                  <label htmlFor={`status-${order._id}-${idx}`} className="block text-sm font-semibold mb-1">
+                    Update Order Status
+                  </label>
+                  <select
+                    id={`status-${order._id}-${idx}`}
+                    defaultValue={item.Orderstatus}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Out for Delivery">Out for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Order;

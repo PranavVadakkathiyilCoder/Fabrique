@@ -23,6 +23,11 @@ const VerifyPayment = async (PaymentDetails: RazorpayVerificationPayload) => {
   return axios.post('/order/verify-razorpay',PaymentDetails);
 }
 
+const GetUserOrder = async () => {
+  return axios.get('/order/getuserorder');
+}
 
-
-export {gettotalamount,OrderCOD,RazorpayCOD,VerifyPayment}
+const GetSellerOrder = async () => {
+  return axios.get('/order/getsellerorder');
+}
+export {gettotalamount,OrderCOD,RazorpayCOD,VerifyPayment,GetUserOrder,GetSellerOrder}

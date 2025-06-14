@@ -8,7 +8,7 @@ const Order = () => {
   const [orderSummary, setOrderSummary] = useState({
     totalAmount: 0,
     offer: 0,
-    deliveryfee: 0,
+    deliveryFee: 0,
   });
 
   const [name, setName] = useState("");
@@ -37,9 +37,11 @@ const Order = () => {
     const Gettotalamount = async () => {
       const res = await gettotalamount();
       if (res.data.success) {
-        const { totalAmount, offer, deliveryfee } = res.data;
-        setOrderSummary({ totalAmount, offer, deliveryfee });
-        settotelamount(totalAmount + deliveryfee - offer);
+        const { totalAmount, offer, deliveryFee } = res.data;
+        console.log(res.data,"fees");
+        
+        setOrderSummary({ totalAmount, offer, deliveryFee });
+        settotelamount(totalAmount + deliveryFee - offer);
       }
     };
     Gettotalamount();
@@ -234,14 +236,14 @@ const Order = () => {
               Discount <span className="text-red-500 font-medium">- ₹{orderSummary.offer}</span>
             </p>
             <p className="flex justify-between text-gray-500">
-              Delivery Fee <span className="text-black font-medium">₹{orderSummary.deliveryfee}</span>
+              Delivery Fee <span className="text-black font-medium">₹{orderSummary.deliveryFee}</span>
             </p>
           </div>
 
           <hr className="my-4" />
 
           <p className="flex justify-between font-semibold text-lg">
-            Total <span>₹{orderSummary.totalAmount + orderSummary.deliveryfee - orderSummary.offer}</span>
+            Total <span>₹{orderSummary.totalAmount + orderSummary.deliveryFee - orderSummary.offer}</span>
           </p>
 
           <button

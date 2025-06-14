@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import Order from "../models/Order.model";
+import Order, { IOrder } from "../models/Order.model";
 import Cart from "../models/Cart.model";
 import razorpay from "../config/Razorpay";
 import crypto from "crypto";
+
 interface AuthRequest extends Request {
   user_info?: { _id: string };
 }
@@ -43,7 +44,7 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
               color: "$color",
               amount: "$amount",
               productcount: "$productcount",
-              seller: "$productDetails.seller"
+              seller: "$productDetails.seller",
             },
           },
         },
@@ -63,9 +64,8 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
         subtotal += item.amount * item.productcount;
       }
 
-      const deliveryfee = 40;
-      const offer = 0;
-      const totalAmount = subtotal + deliveryfee - offer;
+      const deliveryFee = 40;
+      const totalAmount = subtotal + deliveryFee;
 
       const order = await Order.create({
         name,
@@ -73,12 +73,14 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
         pincode,
         phone,
         user: req.user_info._id,
-        seller: group._id,
-        items: group.items,
-        paymentMode,
-        Orderstatus: "Pending",
-        paymentStatus: "pending",
+        items: group.items.map((item: any) => ({
+          ...item,
+          paymentMode,
+          Orderstatus: "Pending",
+          paymentStatus: "pending",
+        })),
         subtotal,
+        deliveryFee,
         totalAmount,
       });
 
@@ -135,7 +137,7 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
               color: "$color",
               amount: "$amount",
               productcount: "$productcount",
-              seller: "$productDetails.seller"
+              seller: "$productDetails.seller",
             },
           },
         },
@@ -160,8 +162,6 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
       receipt: `receipt_${Date.now()}`,
       notes: { userId: req.user_info._id.toString() },
     });
-    console.log(razorpayorder);
-    
 
     const createdOrders = [];
 
@@ -171,9 +171,8 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
         subtotal += item.amount * item.productcount;
       }
 
-      const deliveryfee = 40;
-      const offer = 0;
-      const totalAmountPerGroup = subtotal + deliveryfee - offer;
+      const deliveryFee = 40;
+      const totalAmountPerGroup = subtotal + deliveryFee;
 
       const order = await Order.create({
         name,
@@ -181,13 +180,15 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
         pincode,
         phone,
         user: req.user_info._id,
-        seller: group._id,
-        items: group.items,
-        paymentMode,
-        razorpayOrderId: razorpayorder.id,
-        Orderstatus: "Pending",
-        paymentStatus: "pending",
+        items: group.items.map((item: any) => ({
+          ...item,
+          paymentMode,
+          Orderstatus: "Pending",
+          paymentStatus: "pending",
+          razorpayOrderId: razorpayorder.id,
+        })),
         subtotal,
+        deliveryFee,
         totalAmount: totalAmountPerGroup,
       });
 
@@ -197,17 +198,58 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
     await Cart.deleteMany({ user: req.user_info._id });
 
     res.status(201).json({
-  message: "Orders placed successfully",
-  orders: createdOrders,
-  razorpayOrder: {
-    ...razorpayorder,
-    key_id: process.env.RAZORPAY_KEY_ID, // ✅ Add this
-  },
-});
-    
+      success: true,
+      message: "Orders placed successfully",
+      orders: createdOrders,
+      razorpayOrder: {
+        ...razorpayorder,
+        key_id: process.env.RAZORPAY_KEY_ID,
+      },
+    });
+    return;
   } catch (error) {
     console.error("Order creation error:", error);
     res.status(500).json({ message: "Internal server error" });
+    return;
+  }
+};
+
+// ------------------------------
+// Razorpay Payment Verification
+// ------------------------------
+const verifyRazorpayPayment = async (req: Request, res: Response) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    const generated_signature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+    if (generated_signature !== razorpay_signature) {
+      res.status(400).json({ success: false, message: "Payment verification failed" });
+      return;
+    }
+
+    await Order.updateMany(
+      { "items.razorpayOrderId": razorpay_order_id },
+      {
+        $set: {
+          "items.$[elem].paymentStatus": "completed",
+          "items.$[elem].Orderstatus": "Confirmed",
+          "items.$[elem].razorpayPaymentId": razorpay_payment_id,
+        },
+      },
+      {
+        arrayFilters: [{ "elem.razorpayOrderId": razorpay_order_id }],
+      }
+    );
+
+    res.status(200).json({ success: true, message: "Payment verified successfully" });
+    return;
+  } catch (err) {
+    console.error("Verification Error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
     return;
   }
 };
@@ -249,7 +291,7 @@ const getCartTotalAmount = async (req: AuthRequest, res: Response) => {
       success: true,
       totalAmount: total,
       offer: 0,
-      deliveryfee: 40,
+      deliveryFee: 40,
     });
     return;
   } catch (error) {
@@ -258,42 +300,95 @@ const getCartTotalAmount = async (req: AuthRequest, res: Response) => {
     return;
   }
 };
-const verifyRazorpayPayment = async (req: Request, res: Response) => {
+
+
+const getUserOrders = async (req: AuthRequest, res: Response) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
-    const generated_signature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-      .update(razorpay_order_id + "|" + razorpay_payment_id)
-      .digest("hex");
-
-    if (generated_signature !== razorpay_signature) {
-       res.status(400).json({ success: false, message: "Payment verification failed" });
-       return
+    if (!req.user_info?._id) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
     }
 
-    // Update order(s) with payment success
-    await Order.updateMany(
-      { razorpayOrderId: razorpay_order_id },
-      {
-        $set: {
-          paymentStatus: "success",
-          Orderstatus: "Confirmed",
-          razorpayPaymentId: razorpay_payment_id,
-        },
-      }
-    );
+    const userOrders = await Order.find({ user: req.user_info._id })
+      .sort({ createdAt: -1 })
+      .lean();
 
-     res.status(200).json({ success: true, message: "Payment verified successfully" });
-  } catch (err) {
-    console.error("Verification Error:", err);
-     res.status(500).json({ success: false, message: "Internal server error" });
-     
+    if (!userOrders.length) {
+      res.status(404).json({ message: "No orders found for this user." });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      orders: userOrders,
+    });
+    return;
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };
+
+const getSellerOrders = async (req: AuthRequest, res: Response) => {
+  try {
+    const sellerId = req.user_info?._id?.toString();
+
+    if (!sellerId) {
+      console.error("Missing seller ID");
+      res.status(400).json({ message: "Seller ID missing in request" });
+      return;
+    }
+
+    const orders: IOrder[] = await Order.find({
+      "items.seller": sellerId,
+    }).sort({ createdAt: -1 });
+
+    console.log(`Found ${orders.length} orders for seller ${sellerId}`);
+
+    const sellerOrders = orders
+      .map((order: IOrder) => {
+        const sellerItems = order.items.filter(
+          (item) => item.seller.toString() === sellerId
+        );
+
+        if (sellerItems.length === 0) {
+          return null;
+        }
+
+        return {
+          _id: order._id,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+          user: order.user,
+          name: order.name,
+          address: order.address,
+          pincode: order.pincode,
+          phone: order.phone,
+          subtotal: order.subtotal,
+          deliveryFee: order.deliveryFee,
+          totalAmount: order.totalAmount,
+          items: sellerItems,
+        };
+      })
+      .filter(Boolean);
+
+    res.status(200).json(sellerOrders);
+    return;
+  } catch (error: any) {
+    console.error("Error fetching seller orders:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+    return;
+  }
+};
+
+
+
 export {
   createOrderCOD,
   createOrderRazorpay,
+  verifyRazorpayPayment,
   getCartTotalAmount,
-  verifyRazorpayPayment ,
+  getUserOrders,
+  getSellerOrders
 };

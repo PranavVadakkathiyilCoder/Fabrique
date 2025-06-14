@@ -6,30 +6,28 @@ interface OrderItem {
   color: string;
   size: string;
   productcount: number;
-  amount: number; // price * quantity
-  name: string; // snapshot of product name
-  image: string; // snapshot of image URL
+  amount: number;
+  name: string;
+  image: string;
+  Orderstatus: "Pending" | "Dispatched" | "In Transit" | "Out for Delivery" | "Delivered"|"Confirmed";
+  paymentMode: "cod" | "online";
+  paymentStatus: "pending" | "completed" | "failed";
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
 }
 
 export interface IOrder extends Document {
+  updatedAt: any;
+  createdAt: any;
   user: Types.ObjectId;
   items: OrderItem[];
   name: string;
   address: string;
   pincode: number;
   phone: number;
-
   subtotal: number;
   deliveryFee: number;
   totalAmount: number;
-
-  paymentMode: "cod" | "online";
-  paymentStatus: "pending" | "completed" | "failed";
-
-  razorpayOrderId?: string;
-  razorpayPaymentId?: string;
-
-  Orderstatus: "Pending" | "Dispatched" | "In Transit" | "Out for Delivery" | "Delivered";
 }
 
 const orderItemSchema = new Schema<OrderItem>(
@@ -40,9 +38,21 @@ const orderItemSchema = new Schema<OrderItem>(
     size: { type: String, required: true },
     productcount: { type: Number, required: true },
     amount: { type: Number, required: true },
-
-    name: { type: String, required: true }, // Product name snapshot
-    image: { type: String, required: true }, // Product image snapshot
+    name: { type: String, required: true },
+    image: { type: String, required: true },
+    Orderstatus: {
+      type: String,
+      enum: ["Pending","Confirmed", "Dispatched", "In Transit", "Out for Delivery", "Delivered"],
+      default: "Pending",
+    },
+    paymentMode: { type: String, enum: ["cod", "online"], required: true },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed"],
+      default: "pending",
+    },
+    razorpayOrderId: { type: String },
+    razorpayPaymentId: { type: String },
   },
   { _id: false }
 );
@@ -55,32 +65,9 @@ const orderSchema = new Schema<IOrder>(
     address: { type: String, required: true },
     pincode: { type: Number, required: true },
     phone: { type: Number, required: true },
-
     subtotal: { type: Number, required: true },
     deliveryFee: { type: Number, default: 40 },
     totalAmount: { type: Number, required: true },
-
-    paymentMode: { type: String, enum: ["cod", "online"], required: true },
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "completed", "failed"],
-      default: "pending",
-    },
-
-    razorpayOrderId: { type: String },
-    razorpayPaymentId: { type: String },
-
-    Orderstatus: {
-      type: String,
-      enum: [
-        "Pending",
-        "Dispatched",
-        "In Transit",
-        "Out for Delivery",
-        "Delivered",
-      ],
-      default: "Pending",
-    },
   },
   { timestamps: true }
 );
