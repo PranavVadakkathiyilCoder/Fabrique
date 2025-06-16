@@ -52,19 +52,19 @@ const Dashboard = () => {
   ];
 
   // Optional static pie charts (mocked)
-  const PieChartData2 = [
-    { id: 0, value: 35, label: "Defective" },
-    { id: 1, value: 25, label: "Wrong Item" },
-    { id: 2, value: 20, label: "Size Issue" },
-    { id: 3, value: 15, label: "Late Delivery" },
-    { id: 4, value: 5, label: "Others" },
-  ];
-  const PieChartData3 = [
-    { id: 0, value: 60, label: "Cash on Delivery" },
-    { id: 1, value: 25, label: "UPI" },
-    { id: 2, value: 10, label: "Credit Card" },
-    { id: 3, value: 5, label: "Net Banking" },
-  ];
+  //const PieChartData2 = [
+  //  { id: 0, value: 35, label: "Defective" },
+  //  { id: 1, value: 25, label: "Wrong Item" },
+  //  { id: 2, value: 20, label: "Size Issue" },
+  //  { id: 3, value: 15, label: "Late Delivery" },
+  //  { id: 4, value: 5, label: "Others" },
+  //];
+  //const PieChartData3 = [
+  //  { id: 0, value: 60, label: "Cash on Delivery" },
+  //  { id: 1, value: 25, label: "UPI" },
+  //  { id: 2, value: 10, label: "Credit Card" },
+  //  { id: 3, value: 5, label: "Net Banking" },
+  //];
 
   return (
     <div className="w-screen">

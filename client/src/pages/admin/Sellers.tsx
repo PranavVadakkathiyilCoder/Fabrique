@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import { SellerStatusForAdmin } from '../../apis/productapi';
 
 interface SellerType {
