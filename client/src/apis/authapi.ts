@@ -8,4 +8,15 @@ import axios from "./axios";
 const validateUser = async () => {
     return axios.post('/user/validate')
 }
-export {registerUser,loginUser,validateUser}
+
+const getCurrentUserInfo = async () => {
+    return axios.get('/user/sellerdata')
+}
+
+const Logout = async () => {
+    return axios.post('/user/logout')
+}
+
+
+
+export {registerUser,loginUser,validateUser,getCurrentUserInfo,Logout}

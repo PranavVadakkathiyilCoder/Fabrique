@@ -29,6 +29,8 @@ import CartRoute from './routes/Cart.route'
 
 import OrderRoute from './routes/Order.route'
 
+import ReviewRoute from "./routes/Review.route";
+
 app.use('/api/v1/user',AuthRoute)
 
 app.use('/api/v1/product',ProductRoute)
@@ -36,6 +38,8 @@ app.use('/api/v1/product',ProductRoute)
 app.use('/api/v1/cart',CartRoute)
 
 app.use('/api/v1/order',OrderRoute)
+
+app.use('/api/v1/review',ReviewRoute)
 
 
 

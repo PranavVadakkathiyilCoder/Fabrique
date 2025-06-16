@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/User.model";
 import { uploadToCloudinary } from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
+import Order from "../models/Order.model";
 
 interface AuhtRequest extends Request {
   user_info?: any;
@@ -172,5 +173,65 @@ const getAllUsers = async (req: AuhtRequest, res: Response) => {
 
 //}
 //hi()
+const getCurrentUserInfo = async (req: AuhtRequest, res: Response) => {
+  try {
+    const sellerId = req.user_info?._id;
 
-export { registerUser, loginUser, getAllUsers, LogOut };
+    if (!sellerId) {
+      res.status(401).json({ success: false, message: "Unauthorized" });
+      return;
+    }
+
+    const orderCount = await Order.countDocuments({
+      items: {
+        $elemMatch: {
+          seller: sellerId,
+          Orderstatus: { $in: ["Confirmed", "Pending"] },
+        },
+      },
+    });
+
+    const userdata = await User.findById(sellerId).select("_id name email pic role");
+
+    res.status(200).json({
+      success: true,
+      userdata,
+      orderCount, // total confirmed + pending
+    });
+  } catch (error) {
+    console.error("Error fetching order count:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const logoutUser = async (req: AuhtRequest, res: Response) => {
+  try {
+    
+    if (!req.user_info || !req.user_info._id) {
+       res.status(401).json({ message: "Unauthorized: Invalid user" });
+       return
+    }
+
+    
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict' as const,
+    };
+
+    res
+      .clearCookie("accesstoken", options)
+      .clearCookie("refresh", options)
+      .status(200)
+      .json({
+        success: true,
+        message: "User logged out successfully",
+        clearLocalStorage: true, 
+      });
+  } catch (error) {
+    console.error("Logout Error:", error);
+    res.status(500).json({ message: "Server error while logging out" });
+  }
+};
+
+export { registerUser, loginUser, getAllUsers, LogOut ,getCurrentUserInfo,logoutUser};

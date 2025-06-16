@@ -17,7 +17,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, borderColor
         </p>
       </div>
       <div className="text-center flex justify-center">
-        <p className="text-gray-500">$</p>
+        
         <p className="sm:text-6xl text-4xl">{value}</p>
       </div>
       <p className="float-right px-3 text-3xl text-gray-500">

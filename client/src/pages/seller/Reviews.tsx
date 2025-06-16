@@ -1,58 +1,65 @@
-import ReviewCard from '../../components/ReviewCard'
- const reviewsData = [
-    {
-      name: 'Pranav V',
-      review: 'Lorem ipsum Lorem, ipsum dolor. Lorem ipsum dolor sit amet consectetur.',
-      verified: true,
-      stars: 5,
-    },
-    {
-      name: 'John Doe',
-      review: 'Amazing product! Will buy again.',
-      verified: true,
-      stars: 4,
-    },
-    {
-      name: 'Jane Smith',
-      review: 'Good quality but delivery was late.',
-      verified: false,
-      stars: 3,
-    },
-    {
-      name: 'Pranav V',
-      review: 'Lorem ipsum Lorem, ipsum dolor. Lorem ipsum dolor sit amet consectetur.',
-      verified: true,
-      stars: 5,
-    },
-    {
-      name: 'John Doe',
-      review: 'Amazing product! Will buy again.',
-      verified: true,
-      stars: 4,
-    },
-    {
-      name: 'Jane Smith',
-      review: 'Good quality but delivery was late.',
-      verified: false,
-      stars: 3,
-    },
-  ];
-const Reviews = () => {
-  return (
-    <div className="w-full p-4">
-      <h2 className="font-text text-3xl sm:text-4xl font-semibold tracking-wide">Customer Reviews</h2>
+import { useEffect, useState } from "react";
+import ReviewCard from "../../components/ReviewCard";
+import { GetSellerReview } from "../../apis/Reviewapi"; // Make sure this function exists and is correct
+import ReviewCardLoading from "../../components/Loading/ReviewLoad";
 
-      {reviewsData.map((review, index) => (
-        <ReviewCard
-          key={index}
-          name={review.name}
-          review={review.review}
-          verified={review.verified}
-          stars={review.stars}
-        />
-      ))}
-    </div>
-  );
+interface Review {
+  user: {
+    name: string;
+    email: string;
+  };
+  review: string;
+  rating: number;
+  product?: {
+    name?: string;
+    images?: string[];
+  };
 }
 
-export default Reviews
+const Reviews = () => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await GetSellerReview(); // Must return { reviews: [...] }
+        setReviews(res.data.reviews);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  return (
+    <div className="w-full p-4">
+      <h2 className="text-2xl font-bold mb-4">
+        Customer Reviews
+      </h2>
+
+     <div className="grid sm:grid-cols-4 grid-cols-1">
+       {loading ? (
+        <ReviewCardLoading/>
+      ) : reviews.length === 0 ? (
+        <p>No reviews available.</p>
+      ) : (
+        reviews.map((review, index) => (
+          <ReviewCard
+            key={index}
+            name={review.user.name}
+            review={review.review}
+            verified={true} // Optional: you can add logic to check if it's verified
+            stars={review.rating}
+          />
+        ))
+      )}
+     </div>
+    </div>
+  );
+};
+
+export default Reviews;

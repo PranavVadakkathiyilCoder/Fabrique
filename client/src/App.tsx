@@ -37,6 +37,7 @@ const App = () => {
         <Route element={<ProtectedRoute allowedRoles={['user']} />}>
         <Route element={<LayoutUser />}>
           <Route path="/" element={<UserHome />} />
+          <Route path="/products/:category" element={<AllProducts />} />
           <Route path="/products" element={<AllProducts />} />
           <Route path="/product/:product_id" element={<ProductView />} />
           <Route path="/cart" element={<Cart />} />

@@ -12,7 +12,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ _id,name, price, oldprice, im
   return (
     <>
       <Link to={`/product/${_id}`}>
-      <section className='col-span-1 border border-gray-100 flex flex-col  justify-between'>
+      <section className='col-span-1 border border-gray-100 flex flex-col '>
 
         <img src={image} alt="img" className=' w-full  bg-gray-100 rounded-xl p-1' />
 

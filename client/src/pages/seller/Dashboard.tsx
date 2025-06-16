@@ -1,15 +1,64 @@
+import { useEffect, useState } from 'react'
 import BarChart from '../../components/charts/Barchart'
 import Piechart from '../../components/charts/Piechart'
 import DashboardCard from "../../components/DashboardCard"
-
+import { CategoryCount } from '../../apis/productapi'
+interface IPieChart {
+  id: number;
+  value: number;
+  label: string;
+}
 const Dashboard = () => {
+    const [pieChartData, setPieChartData] = useState<IPieChart[]>([]);
+    const [totalorder, settotalorder] = useState(0)
+    const [stock, setstock] = useState(0)
+    const [totalEarnings, settotalEarnings] = useState(0)
+    const [monthlyearnings, setmonthlyearnings] = useState([])
+    const [avgrating, setavgrating] = useState(0)
+    useEffect(() => {
+      const categorycount=async()=>{
+        try {
+            const res = await CategoryCount()
+            console.log(res.data.data);
+            setstock(res.data.data.totalStock)
+            settotalorder(res.data.data.totalOrders)
+            settotalEarnings(res.data.data.totalEarnings)
+            setmonthlyearnings(res.data.data.monthlyEarningsArray)
+            setavgrating(res.data.data.avgReviewRating)
+            
+
+            const piedata = res.data.data.categoryCounts.map((item:any,index:number)=>({
+                id:index,
+                value:item.count,
+                label:item._id
+
+
+            })
+            
+
+            )
+            setPieChartData(piedata)
+            console.log(pieChartData);
+            
+            
+        } catch (error) {
+            
+        }
+      } 
+      categorycount()
+    }, [])
+    
+
+
+
+
     const cardData = [
-        { title: 'Total Earning', value: 450, borderColor: 'border-l-blue-500' },
-        { title: 'Total Stocks', value: 450, borderColor: 'border-l-red-500' },
-        { title: 'Total Orders', value: 450, borderColor: 'border-l-yellow-500' },
-        { title: 'Reviews', value: 450, borderColor: 'border-l-green-500' },
+        { title: 'Total Earning', value: totalEarnings, borderColor: 'border-l-blue-500' },
+        { title: 'Total Stocks', value:stock , borderColor: 'border-l-red-500' },
+        { title: 'Total Orders', value: totalorder, borderColor: 'border-l-yellow-500' },
+        { title: 'Average Review ⭐', value: avgrating, borderColor: 'border-l-green-500' },
     ];
-    const BarChartData = [35, 44, 24, 34, 6, 49, 30, 15, 25, 30, 50, 12];
+    const BarChartData = monthlyearnings;
     const PieChartData = [
         { id: 0, value: 25, label: 'series A' },
         { id: 1, value: 25, label: 'series B' },
@@ -36,9 +85,8 @@ const Dashboard = () => {
             </section>
             <section>
                 <p className="text-2xl font-bold flex  p-4">Stocks</p>
-                <Piechart PieChartData={PieChartData} />
-                <Piechart PieChartData={PieChartData} />
-                <Piechart PieChartData={PieChartData} />
+                <Piechart PieChartData={pieChartData} />
+                
             </section>
         </div>
     )

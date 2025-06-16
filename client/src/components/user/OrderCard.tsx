@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { BsFillChatDotsFill } from "react-icons/bs";
+import { AiFillStar } from "react-icons/ai";
+import toast from "react-hot-toast";
+import { submitProductReview } from "../../apis/Reviewapi";
 
 interface OrderItemProps {
   item: {
+    product: string; 
     name: string;
     image: string;
     amount: number;
@@ -18,7 +23,13 @@ interface OrderItemProps {
   };
 }
 
+
 const OrderCard: React.FC<OrderItemProps> = ({ item, order }) => {
+  const [rating, setRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [review, setReview] = useState<string>("");
+  
+  
   const statusColor =
     item.Orderstatus === "Delivered"
       ? "text-green-600"
@@ -37,6 +48,39 @@ const OrderCard: React.FC<OrderItemProps> = ({ item, order }) => {
     item.paymentStatus.toLowerCase() === "completed"
       ? "text-green-600"
       : "text-red-500";
+
+  const handleRatingClick = (star: number) => {
+    setRating(star);
+  };
+
+  const handleReviewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setReview(e.target.value);
+  };
+
+  const submitFeedback = async () => {
+  if (rating === 0 || review.trim() === "") {
+    toast.error("Please select a rating and write a review.");
+    return;
+  }
+
+  try {
+    const res = await submitProductReview({
+      product: item.product,
+      order: order._id,
+      rating,
+      review,
+    });
+    console.log(res.data);
+    
+
+    toast.success("Review submitted successfully!");
+    setRating(0);
+    setReview("");
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || "Something went wrong");
+  }
+};
+
 
   return (
     <div className="col-span-1 flex flex-col sm:flex-row bg-white border border-gray-100 shadow-md rounded-2xl p-4 w-full max-w-[420px] transition hover:shadow-lg duration-200">
@@ -71,7 +115,6 @@ const OrderCard: React.FC<OrderItemProps> = ({ item, order }) => {
         </div>
 
         <div className="flex justify-between items-center mt-4">
-          {/* Status */}
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${statusDotColor}`}></span>
             <span className={`text-sm font-medium ${statusColor}`}>
@@ -79,12 +122,45 @@ const OrderCard: React.FC<OrderItemProps> = ({ item, order }) => {
             </span>
           </div>
 
-          {/* Chat */}
           <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full text-xs hover:bg-gray-800 transition-all duration-150">
             <BsFillChatDotsFill className="text-sm" />
             Chat Store
           </button>
         </div>
+
+        {/* Feedback Form */}
+        {item.Orderstatus === "Delivered" && (
+          <div className="mt-4 border-t pt-3">
+            <div className="flex items-center gap-1 mb-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <AiFillStar
+                  key={star}
+                  onClick={() => handleRatingClick(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className={`text-xl cursor-pointer ${
+                    (hoverRating || rating) >= star ? "text-yellow-400" : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <textarea
+              placeholder="Write your review..."
+              className="w-full text-sm border rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-black"
+              rows={2}
+              value={review}
+              onChange={handleReviewChange}
+            />
+
+            <button
+              onClick={submitFeedback}
+              className="mt-2 w-full bg-black text-white py-1.5 text-sm rounded-md hover:bg-gray-800 transition-all"
+            >
+              Submit Review
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

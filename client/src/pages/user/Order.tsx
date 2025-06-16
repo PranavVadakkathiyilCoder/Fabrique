@@ -4,6 +4,7 @@ import { GetUserOrder } from "../../apis/order";
 
 // Single item in an order
 interface OrderItem {
+  product: string; // <-- ADD THIS
   name: string;
   image: string;
   amount: number;

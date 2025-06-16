@@ -29,6 +29,7 @@ function ProductView() {
     const [productcount, setproductcount] = useState<number>(1)
     const [color, setcolor] = useState<string>("")
     const [size, setsize] = useState<string>('')
+    const [search, setsearch] = useState<string>("")
 
     const navigate = useNavigate()
     const { product_id } = useParams<{ product_id: string }>();

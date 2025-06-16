@@ -1,7 +1,8 @@
 import { FiSearch } from "react-icons/fi";
 import { IoClose } from "react-icons/io5"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useNavContext } from "../../context/NavContext";
+import { useEffect, useState } from "react";
 
 const categories = [
     { data: "T-Shirts", Link: "t-shirts" },
@@ -20,6 +21,12 @@ const categories = [
 
 const NavBarMobile = () => {
       const {userNav,setuserNav} = useNavContext()
+      const [search, setsearch] = useState<string>("")
+      const navigate = useNavigate()
+      const Searching = ()=>{
+        navigate(`/products/${search}`)
+      }
+      
     
     return (
         <div className={`${userNav ? "fixed" : "hidden"}  top-0 left-0 w-full h-screen bg-white z-9999`}>
@@ -29,8 +36,8 @@ const NavBarMobile = () => {
             </section>
             <section>
                 <div className="border flex justify-between items-center p-1 m-2 rounded-full ">
-                    <input type="text" name="search" id="search" className="outline-none px-2 "/>
-                    <button className=" p-3 rounded-full bg-black text-white"><FiSearch/></button>
+                    <input onChange={(e)=>setsearch(e.target.value)} type="text" name="search" id="search" className="outline-none px-2 "/>
+                    <button onClick={()=>{Searching(); setuserNav(!userNav);}}  className=" p-3 rounded-full bg-black text-white"><FiSearch/></button>
                 </div>
             </section>
             <section>
@@ -38,7 +45,7 @@ const NavBarMobile = () => {
                     {
                         categories.map((info, index) => (
                             <li key={index} className="p-3" onClick={()=>setuserNav(!userNav)}>
-                                <Link to={`/product/${info.Link}`}>
+                                <Link to={`/products/${info.Link}`}>
                                     <p className="text-xl">{info.data}</p>
                                 </Link>
                             </li>
