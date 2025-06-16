@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import OrderCard from "../../components/user/OrderCard";
+import OrderCardLoading from "../../components/Loading/OrderCardLoading";
 import { GetUserOrder } from "../../apis/order";
 
-// Single item in an order
 interface OrderItem {
-  product: string; // <-- ADD THIS
+  product: string;
   name: string;
   image: string;
   amount: number;
@@ -15,7 +15,6 @@ interface OrderItem {
   paymentMode: string;
 }
 
-// Entire order
 interface Order {
   _id: string;
   createdAt: string;
@@ -25,30 +24,43 @@ interface Order {
 
 const OrdersList = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const getuserorders = async () => {
       try {
         const res = await GetUserOrder();
         setOrders(res.data.orders);
-        console.log(res.data.orders);
       } catch (error) {
         console.log("Order", error);
+      } finally {
+        setLoading(false);
       }
     };
     getuserorders();
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen">
       <h2 className="text-2xl font-semibold mb-6">Your Orders</h2>
-      <div className="grid sm:grid-cols-3 grid-cols-1 gap-2 justify-start">
-        {orders.map((order) =>
-          order.items.map((item, idx) => (
-            <OrderCard key={`${order._id}-${idx}`} item={item} order={order} />
-          ))
-        )}
-      </div>
+
+      {loading ? (
+        <div className="grid sm:grid-cols-3 grid-cols-1 gap-4">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <OrderCardLoading key={idx} />
+          ))}
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="text-center text-gray-500 text-lg">No orders found.</div>
+      ) : (
+        <div className="grid sm:grid-cols-3 grid-cols-1 gap-4">
+          {orders.map((order) =>
+            order.items.map((item, idx) => (
+              <OrderCard key={`${order._id}-${idx}`} item={item} order={order} />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };

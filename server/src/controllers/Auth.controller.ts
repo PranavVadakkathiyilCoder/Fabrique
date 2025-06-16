@@ -3,6 +3,7 @@ import User from "../models/User.model";
 import { uploadToCloudinary } from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
 import Order from "../models/Order.model";
+import Cart from "../models/Cart.model";
 
 interface AuhtRequest extends Request {
   user_info?: any;
@@ -173,7 +174,7 @@ const getAllUsers = async (req: AuhtRequest, res: Response) => {
 
 //}
 //hi()
-const getCurrentUserInfo = async (req: AuhtRequest, res: Response) => {
+const getCurrentSellerInfo = async (req: AuhtRequest, res: Response) => {
   try {
     const sellerId = req.user_info?._id;
 
@@ -233,5 +234,30 @@ const logoutUser = async (req: AuhtRequest, res: Response) => {
     res.status(500).json({ message: "Server error while logging out" });
   }
 };
+const getCurrentUserInfo = async (req: AuhtRequest, res: Response) => {
+  try {
+    const userId = req.user_info?._id;
 
-export { registerUser, loginUser, getAllUsers, LogOut ,getCurrentUserInfo,logoutUser};
+    if (!userId) {
+       res.status(401).json({ success: false, message: "Unauthorized" });
+       return
+    }
+
+    const cartCount = await Cart.countDocuments({ user: userId });
+
+    const userdata = await User.findById(userId).select("_id name email pic role");
+
+     res.status(200).json({
+      success: true,
+      userdata,
+      cartCount,
+    });
+    
+  } catch (error) {
+    console.error("Error in getCurrentUserInfo:", error);
+     res.status(500).json({ success: false, message: "Internal Server Error" });
+     return
+  }
+};
+
+export { registerUser, loginUser, getAllUsers, LogOut ,getCurrentUserInfo,logoutUser,getCurrentSellerInfo};

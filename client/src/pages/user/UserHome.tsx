@@ -6,7 +6,11 @@ import CustomerReview from "../../components/user/CustomerReview"
 import Accessories from "../../components/user/Accessories"
 
 
+
 const UserHome = () => {
+  
+  
+  
   return (
     <>
     

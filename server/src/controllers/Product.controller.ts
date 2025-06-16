@@ -220,7 +220,7 @@ const searchProducts = async (req: Request, res: Response) => {
 
     const products = await Product.find({
       $or: [
-        //{ name: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: 'i' } },
         //{ description: { $regex: search, $options: 'i' } },
         { category: { $regex: search, $options: 'i' } }
       ]

@@ -6,12 +6,17 @@ import axios from "./axios";
     return axios.post('/user/login',data)
 }
 const validateUser = async () => {
-    return axios.post('/user/validate')
+    return axios.get('/user/validate')
+}
+
+const getCurrentSellerInfo = async () => {
+    return axios.get('/user/sellerdata')
 }
 
 const getCurrentUserInfo = async () => {
-    return axios.get('/user/sellerdata')
+    return axios.get('/user/userdata')
 }
+
 
 const Logout = async () => {
     return axios.post('/user/logout')
@@ -19,4 +24,4 @@ const Logout = async () => {
 
 
 
-export {registerUser,loginUser,validateUser,getCurrentUserInfo,Logout}
+export {registerUser,loginUser,validateUser,getCurrentUserInfo,Logout,getCurrentSellerInfo}

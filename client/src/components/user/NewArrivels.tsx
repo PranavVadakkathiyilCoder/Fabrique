@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import ProductCard from './ProductCard'
 import { NewArrivelsProduct } from '../../apis/productapi'
 import ProductCardLoading from '../Loading/ProductCardLoading'
+import { useNavigate } from 'react-router-dom'
+
 interface Product {
   _id: string;
   name: string;
@@ -13,7 +15,7 @@ interface Product {
 const NewArrivels = () => {
   const [products, setproducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-
+  const navigate = useNavigate()
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -22,6 +24,7 @@ const NewArrivels = () => {
         setproducts(data.data.products)
       } catch (error) {
         console.log(error);
+        
 
       }
       finally {

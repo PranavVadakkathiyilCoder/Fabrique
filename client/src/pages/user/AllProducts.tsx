@@ -29,8 +29,8 @@ const categories = [
 ];
 
 const selling = [
-    { data: "Top Selling" },
-    { data: "New Arrivals" },
+    { data: "TopSelling" },
+    { data: "NewArrivals" },
 ];
 
 const AllProducts = () => {
@@ -112,7 +112,7 @@ const AllProducts = () => {
 
     return (
         <>
-            <div>
+            <div className="mb-20">
                 <section>
                     <button
                         onClick={() => setfilter(!filter)}

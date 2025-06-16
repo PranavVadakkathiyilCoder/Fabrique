@@ -4,7 +4,7 @@ import { IoMdContact } from "react-icons/io"
 import { MdOutlineShoppingBag } from "react-icons/md"
 import { Link, useNavigate } from "react-router-dom"
 import { useNavContext } from "../../context/NavContext"
-import { getCurrentUserInfo, Logout } from "../../apis/authapi"; // ✅ import the API function
+import { getCurrentSellerInfo, Logout } from "../../apis/authapi"; // ✅ import the API function
 
 const navLinks = [
   { name: "Dashboard", path: "/store" },
@@ -31,7 +31,7 @@ const SellerHeader = () => {
   useEffect(() => {
     const fetchSellerInfo = async () => {
       try {
-        const res = await getCurrentUserInfo();
+        const res = await getCurrentSellerInfo();
         console.log("Seller Info:", res.data);
         setsellerdata(res.data.userdata)
         setordercount(res.data.orderCount)

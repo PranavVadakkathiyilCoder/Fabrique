@@ -28,7 +28,7 @@ const App = () => {
   return (
     <>
       <Toaster/>
-      <Routes>
+      <Routes >
         <Route element={<PublicRoute/>}>
           <Route path="/auth" element={<Auth/>} />
         </Route>

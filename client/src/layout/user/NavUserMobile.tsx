@@ -2,7 +2,7 @@ import { FiSearch } from "react-icons/fi";
 import { IoClose } from "react-icons/io5"
 import { Link, useNavigate } from "react-router-dom"
 import { useNavContext } from "../../context/NavContext";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 
 const categories = [
     { data: "T-Shirts", Link: "t-shirts" },
@@ -24,7 +24,9 @@ const NavBarMobile = () => {
       const [search, setsearch] = useState<string>("")
       const navigate = useNavigate()
       const Searching = ()=>{
-        navigate(`/products/${search}`)
+        if (search.trim()) {
+      navigate(`/products/${search}`);
+    }
       }
       
     

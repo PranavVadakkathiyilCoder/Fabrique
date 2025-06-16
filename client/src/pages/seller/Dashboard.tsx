@@ -42,6 +42,7 @@ const Dashboard = () => {
             
             
         } catch (error) {
+            console.log(error);
             
         }
       } 
@@ -59,12 +60,12 @@ const Dashboard = () => {
         { title: 'Average Review ⭐', value: avgrating, borderColor: 'border-l-green-500' },
     ];
     const BarChartData = monthlyearnings;
-    const PieChartData = [
-        { id: 0, value: 25, label: 'series A' },
-        { id: 1, value: 25, label: 'series B' },
-        { id: 2, value: 20, label: 'series C' },
-        { id: 3, value: 30, label: 'series D' },
-    ];
+    //const PieChartData = [
+    //    { id: 0, value: 25, label: 'series A' },
+    //    { id: 1, value: 25, label: 'series B' },
+    //    { id: 2, value: 20, label: 'series C' },
+    //    { id: 3, value: 30, label: 'series D' },
+    //];
     return (
         <div className="w-screen">
             <h2 className="text-2xl font-bold  p-4">Dashboard

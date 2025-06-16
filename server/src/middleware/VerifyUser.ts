@@ -13,11 +13,12 @@ const verifyUser =async(req:AuhtRequest,res:Response,next:NextFunction)=>{
 
 
     if(!token){
-        res.status(400).json({message:"User Unauthorized"})
+        res.status(400).json({success:false,message:"User Unauthorized"})
+        return
     }
     const tokendecode = await jwt.verify(token,process.env.JWT_SECRET!)as JwtPayload
     const userdata = await User.findById(tokendecode?._id).select("-password");
-    if(!userdata) res.status(400).json({message:"No user Exist"})
+    if(!userdata){ res.status(400).json({message:"No user Exist"} ); return}
     req.user_info = userdata
     next()
     } catch (error) {

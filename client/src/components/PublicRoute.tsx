@@ -1,6 +1,23 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { useEffect } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import { validateUser } from '../apis/authapi';
 
 const PublicRoute = () => {
+  useEffect(() => {
+    const ValidateUser = async () => {
+      try {
+        const res = await validateUser();
+        console.log("Validation success:", res.data.success);
+      } catch (error) {
+        localStorage.clear();
+        console.log(error);
+        
+      }
+    };
+
+    ValidateUser();
+  }, []);
+
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
 
@@ -12,4 +29,5 @@ const PublicRoute = () => {
 
   return <Outlet />;
 };
-export default PublicRoute
+
+export default PublicRoute;
