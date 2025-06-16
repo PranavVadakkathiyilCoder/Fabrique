@@ -30,6 +30,9 @@ const UserNav = () => {
         setcartCount(res.data.cartCount);
       } catch (error) {
         console.error("Error fetching user info:", error);
+        localStorage.clear()
+        navigate('/auth')
+
       }
     };
     fetchUserInfo();

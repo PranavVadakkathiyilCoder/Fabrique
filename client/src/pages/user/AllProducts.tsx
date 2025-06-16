@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import ProductCard from "../../components/user/ProductCard";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useNavContext } from "../../context/NavContext";
 import { FilterProduct, GetAllProduct, SearchProducts } from "../../apis/productapi";
@@ -44,7 +44,7 @@ const AllProducts = () => {
 
     const product = useParams();
     const { filter, setfilter } = useNavContext();
-
+    const navigate = useNavigate()
     // Fetch all products initially
     useEffect(() => {
         const getProduct = async () => {
@@ -71,6 +71,8 @@ const AllProducts = () => {
                 setProducts(res.data.products);
             } catch (error) {
                 console.log("Error fetching search results", error);
+                localStorage.clear()
+                navigate('/auth')
             } finally {
                 setLoading(false);
             }
@@ -80,33 +82,33 @@ const AllProducts = () => {
 
 
     const handleFilterClick = async () => {
-    try {
-        setLoading(true);
-        const minPrice = 200;
-        const maxPrice = Number(price);
+        try {
+            setLoading(true);
+            const minPrice = 200;
+            const maxPrice = Number(price);
 
-        const res = await FilterProduct({
-            category: selectedCategory,
-            minPrice,
-            maxPrice,
-            rating: selectedRating ?? undefined,
-            selling: selectedSelling,
-        });
+            const res = await FilterProduct({
+                category: selectedCategory,
+                minPrice,
+                maxPrice,
+                rating: selectedRating ?? undefined,
+                selling: selectedSelling,
+            });
 
-        if (res.data.products.length === 0) {
-            toast.error("No products found with selected filters.");
-            const all = await GetAllProduct();
-            setProducts(all.data.products);
-        } else {
-            setProducts(res.data.products);
+            if (res.data.products.length === 0) {
+                toast.error("No products found with selected filters.");
+                const all = await GetAllProduct();
+                setProducts(all.data.products);
+            } else {
+                setProducts(res.data.products);
+            }
+        } catch (error) {
+            console.error("Error filtering products", error);
+            toast.error("Something went wrong while filtering.");
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        console.error("Error filtering products", error);
-        toast.error("Something went wrong while filtering.");
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
 
 
