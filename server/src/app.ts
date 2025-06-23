@@ -1,6 +1,9 @@
 import  express, { Application }  from "express";
 import cors from 'cors'
 import cookieParser from "cookie-parser";
+import "./config/Passport";
+import passport from "passport";
+
 const app:Application = express()
 
 app.use(cors({
@@ -41,6 +44,42 @@ app.use('/api/v1/order',OrderRoute)
 
 app.use('/api/v1/review',ReviewRoute)
 
+app.use(passport.initialize());
+app.get('/auth/google',
+  passport.authenticate('google', {
+    session: false,
+    scope: ['profile', 'email']
+  })
+);
+
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/auth' }),
+  (req: any, res) => {
+    const { accesstoken, refreshtoken, user } = req.user;
+
+    
+    res
+      .cookie('accesstoken', accesstoken, {
+        httpOnly: true,
+        secure: true,
+        
+      })
+      .cookie('refreshtoken', refreshtoken, {
+        httpOnly: true,
+        secure: true, 
+        
+      })
+      
+      .status(200)
+      
+        
+      
+      .redirect('http://localhost:5173');
+      
+      
+  }
+);
 
 
 

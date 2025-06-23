@@ -4,26 +4,27 @@ import { uploadToCloudinary } from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
 import Order from "../models/Order.model";
 import Cart from "../models/Cart.model";
+import AccessandRefreshToken from "../config/AccessandRefreshToken";
 
 interface AuhtRequest extends Request {
   user_info?: any;
 }
-const AccessandRefreshToken = async (
-  userId: string
-): Promise<{ accesstoken: string; refreshtoken: string }> => {
-  try {
-    const user = await User.findById(userId);
+//const AccessandRefreshToken = async (
+//  userId: string
+//): Promise<{ accesstoken: string; refreshtoken: string }> => {
+//  try {
+//    const user = await User.findById(userId);
 
-    const accesstoken =  user.AccessToken();
-    const refreshtoken =  user.RefreshToken();
-    user.refreshToken = refreshtoken;
-    await user.save();
-    return { accesstoken, refreshtoken };
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+//    const accesstoken =  user.AccessToken();
+//    const refreshtoken =  user.RefreshToken();
+//    user.refreshToken = refreshtoken;
+//    await user.save();
+//    return { accesstoken, refreshtoken };
+//  } catch (error) {
+//    console.log(error);
+//    throw error;
+//  }
+//};
 const registerUser = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
   const avatarPath = (
@@ -132,25 +133,23 @@ const LogOut = async (req: AuhtRequest, res: Response) => {
   }
 };
 
-//const validate = async (req: Request, res: Response) => {
-//  const token = req.cookies.accesstoken
-//  if (!token) { res.status(401).json({ message: 'Unauthorized' })
-//    return
-//  }
-//    const user = await User.findOne() // You may need user to check role/email match
+const validateuser = async (req: AuhtRequest, res: Response) => {
+  const userInfo = req.user_info
+  if (!userInfo) { res.status(401).json({ message: 'Unauthorized' })
+    return
+  }
+    const user = await User.findById(userInfo._id) // You may need user to check role/email match
 
-//  if (!user) { res.status(401).json({ message: 'User not found' })
-//    return
-//  }
+  if (!user) { res.status(401).json({ message: 'User not found' })
+    return
+  }
+  const { accesstoken, refreshtoken } =await AccessandRefreshToken(user._id)
 
-//  const result = user.validateToken(token)
-//  if(!result.valid){
-//    res.status(401).json({ message: result.error})
-//  }
+  
    
-//  res.status(200).json({ message: "validuser"})
+  res.status(200).json({success:true, message: "validuser",user,accesstoken})
 
-//}
+}
 const getAllUsers = async (req: AuhtRequest, res: Response) => {
   const { search } = req.query;
   const SearchResult = search
@@ -260,4 +259,4 @@ const getCurrentUserInfo = async (req: AuhtRequest, res: Response) => {
   }
 };
 
-export { registerUser, loginUser, getAllUsers, LogOut ,getCurrentUserInfo,logoutUser,getCurrentSellerInfo};
+export { registerUser, loginUser, getAllUsers, LogOut ,getCurrentUserInfo,logoutUser,getCurrentSellerInfo,validateuser};

@@ -35,6 +35,9 @@ export function Auth() {
   Formdata.append("email", email)
   Formdata.append("password", password)
   if (pic) Formdata.append("avatar", pic)
+    const handleGoogleLogin = () => {
+  window.location.href = "http://localhost:3000/auth/google";
+};
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -96,6 +99,7 @@ export function Auth() {
         <form onSubmit={handleAuth}>
           <div className="flex flex-col gap-6 ">
             <button
+            onClick={()=>handleGoogleLogin()}
               type="button"
               className="flex items-center justify-center gap-2 border border-gray-400 rounded px-4 py-2 w-full text-sm hover:bg-gray-100"
             >
