@@ -93,21 +93,24 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     const option = {
       httpOnly: true,
       secure: true,
-      
     };
     const { accesstoken, refreshtoken } = await AccessandRefreshToken(user._id);
 
-    res.status(201).cookie("accesstoken", accesstoken, option).cookie("refresh", refreshtoken, option).json({
-      success: true,
+    res
+      .status(201)
+      .cookie("accesstoken", accesstoken, option)
+      .cookie("refresh", refreshtoken, option)
+      .json({
+        success: true,
 
-      message: "Login Successfully",
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      pic: user.pic,
-      token: accesstoken,
-      role: user.role,
-    });
+        message: "Login Successfully",
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        pic: user.pic,
+        token: accesstoken,
+        role: user.role,
+      });
   } catch (error) {
     console.log("Login error", error);
   }
@@ -124,32 +127,37 @@ const LogOut = async (req: AuhtRequest, res: Response) => {
       httpOnly: true,
       secure: true,
     };
-    res.status(201).clearCookie("accesstoken", option).json({
-      success: true,
-      message: "Logout success",
-    });
+    res
+      .status(201)
+      .clearCookie("accesstoken", option)
+      .clearCookie("refreshtoken", option)
+      .json({
+        success: true,
+        message: "Logout success",
+      });
   } catch (error) {
     console.log("Logout error", error);
   }
 };
 
 const validateuser = async (req: AuhtRequest, res: Response) => {
-  const userInfo = req.user_info
-  if (!userInfo) { res.status(401).json({ message: 'Unauthorized' })
-    return
+  const userInfo = req.user_info;
+  if (!userInfo) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
   }
-    const user = await User.findById(userInfo._id) // You may need user to check role/email match
+  const user = await User.findById(userInfo._id); // You may need user to check role/email match
 
-  if (!user) { res.status(401).json({ message: 'User not found' })
-    return
+  if (!user) {
+    res.status(401).json({ message: "User not found" });
+    return;
   }
-  const { accesstoken, refreshtoken } =await AccessandRefreshToken(user._id)
+  const { accesstoken, refreshtoken } = await AccessandRefreshToken(user._id);
 
-  
-   
-  res.status(200).json({success:true, message: "validuser",user,accesstoken})
-
-}
+  res
+    .status(200)
+    .json({ success: true, message: "validuser", user, accesstoken });
+};
 const getAllUsers = async (req: AuhtRequest, res: Response) => {
   const { search } = req.query;
   const SearchResult = search
@@ -191,7 +199,9 @@ const getCurrentSellerInfo = async (req: AuhtRequest, res: Response) => {
       },
     });
 
-    const userdata = await User.findById(sellerId).select("_id name email pic role");
+    const userdata = await User.findById(sellerId).select(
+      "_id name email pic role"
+    );
 
     res.status(200).json({
       success: true,
@@ -206,17 +216,15 @@ const getCurrentSellerInfo = async (req: AuhtRequest, res: Response) => {
 
 const logoutUser = async (req: AuhtRequest, res: Response) => {
   try {
-    
     if (!req.user_info || !req.user_info._id) {
-       res.status(401).json({ message: "Unauthorized: Invalid user" });
-       return
+      res.status(401).json({ message: "Unauthorized: Invalid user" });
+      return;
     }
 
-    
     const options = {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict' as const,
+      sameSite: "strict" as const,
     };
 
     res
@@ -226,7 +234,7 @@ const logoutUser = async (req: AuhtRequest, res: Response) => {
       .json({
         success: true,
         message: "User logged out successfully",
-        clearLocalStorage: true, 
+        clearLocalStorage: true,
       });
   } catch (error) {
     console.error("Logout Error:", error);
@@ -238,25 +246,35 @@ const getCurrentUserInfo = async (req: AuhtRequest, res: Response) => {
     const userId = req.user_info?._id;
 
     if (!userId) {
-       res.status(401).json({ success: false, message: "Unauthorized" });
-       return
+      res.status(401).json({ success: false, message: "Unauthorized" });
+      return;
     }
 
     const cartCount = await Cart.countDocuments({ user: userId });
 
-    const userdata = await User.findById(userId).select("_id name email pic role");
+    const userdata = await User.findById(userId).select(
+      "_id name email pic role"
+    );
 
-     res.status(200).json({
+    res.status(200).json({
       success: true,
       userdata,
       cartCount,
     });
-    
   } catch (error) {
     console.error("Error in getCurrentUserInfo:", error);
-     res.status(500).json({ success: false, message: "Internal Server Error" });
-     return
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+    return;
   }
 };
 
-export { registerUser, loginUser, getAllUsers, LogOut ,getCurrentUserInfo,logoutUser,getCurrentSellerInfo,validateuser};
+export {
+  registerUser,
+  loginUser,
+  getAllUsers,
+  LogOut,
+  getCurrentUserInfo,
+  logoutUser,
+  getCurrentSellerInfo,
+  validateuser,
+};

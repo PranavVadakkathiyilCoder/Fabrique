@@ -6,7 +6,6 @@ import AccessandRefreshToken from "./AccessandRefreshToken";
 dotenv.config();
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-console.log(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
 
 passport.use(
   new GoogleStrategy(
@@ -18,8 +17,8 @@ passport.use(
 
     async function (accessToken, refreshToken, profile, cb) {
       try {
-        console.log(accessToken, refreshToken, profile);
-
+        
+        
         const user = await User.findOne({ email: profile._json.email });
         if (!user) {
           const password =
@@ -29,6 +28,7 @@ passport.use(
             name: profile._json.name,
             email: profile._json.email,
             password: password,
+            pic:profile._json.picture
           });
           const { accesstoken, refreshtoken } = await AccessandRefreshToken(
             user._id
