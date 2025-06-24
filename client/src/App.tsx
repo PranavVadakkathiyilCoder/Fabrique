@@ -25,6 +25,7 @@ import {Toaster} from 'react-hot-toast'
 import PublicRoute from './components/PublicRoute'
 import AddProduct from './components/seller/AddProduct'
 import ScrollToTop from './components/ScrollerTop'
+import Coupon from './pages/admin/Coupon'
 const App = () => {
   return (
     <>
@@ -58,6 +59,8 @@ const App = () => {
           <Route path="/chats" element={<Chats />} />
           <Route path="/addproduct" element={<AddProduct />} />
           
+           
+
 
         </Route>
         </Route>
@@ -69,6 +72,7 @@ const App = () => {
           <Route path="/manage_user" element={<Users />} />
           <Route path="/manage_seller" element={<Sellers />} />
           <Route path="/reviews/:_id" element={<AllReviews />} />
+          <Route path="/coupons" element={<Coupon/>} />
         </Route>
         </Route>
         <Route path="*" element={<NotFound/>} />

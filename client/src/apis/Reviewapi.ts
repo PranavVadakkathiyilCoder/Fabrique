@@ -1,4 +1,4 @@
-import axios from "./axios"; // or wherever you export your axios instance
+import axios from "./axios"; 
 
  const submitProductReview = async (data: {
   product: string;

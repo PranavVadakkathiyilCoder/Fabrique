@@ -8,6 +8,7 @@ const navLinks = [
   { name: "Product Management", path: "/manage_product" },
   { name: "Seller Management", path: "/manage_seller" },
   { name: "User Management", path: "/manage_user" },
+  { name: "Coupons", path: "/coupons" },
   
 ];
 

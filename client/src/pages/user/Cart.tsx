@@ -5,6 +5,10 @@ import { FaArrowRight, FaShoppingCart } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { getcart } from "../../apis/cartapi";
 import { useNavigate } from "react-router-dom";
+import { ValidateCoupon } from "../../apis/Couponapi";
+import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react"
+
 
 interface ProductType {
   _id: string;
@@ -27,7 +31,22 @@ const Cart = () => {
   const [cartitems, setcartitems] = useState<CartItemType[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalamount, settotalamount] = useState(0);
+  const [coupon, setcoupon] = useState("")
+  const [couponloading, setcouponloading] = useState(false)
   const navigate = useNavigate();
+  const successmsg = (msg: string) => {
+    toast.success(msg, {
+      icon: "👏",
+      style: { backgroundColor: "black", color: "white" },
+    })
+  }
+
+  const errmsg = (msg: string) => {
+    toast.error(msg, {
+      icon: "🔥",
+      style: { backgroundColor: "#d00000", color: "white" },
+    })
+  }
 
   useEffect(() => {
     const getcartitem = async () => {
@@ -53,6 +72,36 @@ const Cart = () => {
       console.log(err);
     }
   };
+
+  const CheckCoupon = async (coupon: string) => {
+    try {
+      if(!coupon) {errmsg("Add Coupon code"); return}
+      setcouponloading(true)
+      const res = await ValidateCoupon(coupon)
+      console.log(res.data);
+      if (res.data.success) {
+        setcouponloading(false)
+        successmsg(res.data.message)
+      }
+      else{
+        errmsg(res.data.message)
+      }
+    } catch (error) {
+      setcouponloading(false)
+      
+      
+    errmsg("Not a Valid Coupon");
+      console.log(error);
+
+    }
+    finally {
+      setcouponloading(false)
+    }
+
+  }
+
+
+
 
   const promodiscount = 0;
   const Subtotal = totalamount + 40 - promodiscount;
@@ -111,22 +160,29 @@ const Cart = () => {
         </p>
 
         {/* Promo Code */}
-        <form className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2">
           <div className="flex items-center border border-gray-300 rounded-full px-3 py-1 w-full">
             <LuTag className="text-gray-400 mr-2" />
             <input
               type="text"
+              value={coupon}
               placeholder="Add Promo code"
               className="flex-grow outline-none bg-transparent text-sm"
+              onChange={(e) => setcoupon(e.target.value)}
             />
           </div>
           <button
-            type="submit"
+            onClick={() => CheckCoupon(coupon)}
             className="px-4 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-800"
           >
-            Submit
+            {
+              couponloading ? (<Loader2 />) : (
+                "Submit"
+              )
+            }
+
           </button>
-        </form>
+        </div>
 
         {/* Checkout Button */}
         <button

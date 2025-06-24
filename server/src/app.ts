@@ -34,6 +34,8 @@ import OrderRoute from './routes/Order.route'
 
 import ReviewRoute from "./routes/Review.route";
 
+import CouponRoute from './routes/Coupon.route'
+
 app.use('/api/v1/user',AuthRoute)
 
 app.use('/api/v1/product',ProductRoute)
@@ -43,6 +45,9 @@ app.use('/api/v1/cart',CartRoute)
 app.use('/api/v1/order',OrderRoute)
 
 app.use('/api/v1/review',ReviewRoute)
+
+app.use('/api/v1/coupon',CouponRoute)
+
 
 app.use(passport.initialize());
 app.get('/auth/google',

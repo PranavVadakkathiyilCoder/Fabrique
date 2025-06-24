@@ -4,13 +4,14 @@ import { IoMdContact } from "react-icons/io"
 import { MdOutlineShoppingBag } from "react-icons/md"
 import { Link, useNavigate } from "react-router-dom"
 import { useNavContext } from "../../context/NavContext"
-import { getCurrentSellerInfo, Logout } from "../../apis/authapi"; // ✅ import the API function
+import { getCurrentSellerInfo, Logout } from "../../apis/authapi"; 
 
 const navLinks = [
   { name: "Dashboard", path: "/store" },
   { name: "Product Management", path: "/manageproduct" },
   { name: "Orders", path: "/orders" },
   { name: "Reviews", path: "/reviews" },
+  
   { name: "Chats", path: "/chats" },
 ];
 
