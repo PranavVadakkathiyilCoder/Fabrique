@@ -13,6 +13,10 @@ const GetSellerReview = async () => {
   return axios.get("/review/getsellerreview");
 };
 
+const GetAllReview = async () => {
+  return axios.get("/review/allreview");
+};
 
 
-export {submitProductReview,GetSellerReview}
+
+export {submitProductReview,GetSellerReview,GetAllReview}

@@ -30,6 +30,7 @@ function ProductView() {
     const [color, setcolor] = useState<string>("")
     const [size, setsize] = useState<string>('')
     const [search, setsearch] = useState<string>("")
+    const [activeimg, setactiveimg] = useState("")
 
     const navigate = useNavigate()
     const { product_id } = useParams<{ product_id: string }>();
@@ -55,6 +56,7 @@ function ProductView() {
             try {
                 const data = await GetSingleProduct(product_id!);
                 setproduct(data.data.product);
+                setactiveimg(data.data.product.images[0])
             } catch (error) {
                 console.log(error);
             } finally {
@@ -106,7 +108,7 @@ function ProductView() {
                 <aside className="sm:w-2/5 w-full h-[540px]   overflow-hidden flex flex-col justify-between">
                     <div className="w-full h-[80%] border rounded-sm border-gray-200">
                         <img
-                            src={product.images[0]}
+                            src={activeimg}
                             alt={product.name}
                             className="w-full h-full object-cover p-2"
                         />
@@ -114,7 +116,8 @@ function ProductView() {
                     <div className="w-full h-[20%] grid grid-cols-4 gap-1 p-1">
                         {product.images.slice(0, 4).map((img, i) => (
                             <div key={i} className="w-full h-full border rounded-sm border-gray-200 p-1 overflow-hidden">
-                                <img src={img} alt={`thumb-${i}`} className="w-full h-full object-cover" />
+                                <img src={img} onClick={()=>setactiveimg(img)} alt={`thumb-${i}`} className="w-full h-full object-cover" />
+                                
                             </div>
                         ))}
                     </div>
@@ -146,13 +149,13 @@ function ProductView() {
 
                         <p className="font-medium">Select Color</p>
                         <div className="flex gap-3 py-2">
-                            {product.colors.map((color, i) => (
+                            {product.colors.map((c, i) => (
                                 <div
                                     key={i}
-                                    className="w-8 h-8 border rounded-full"
-                                    style={{ backgroundColor: color, opacity: 0.5 }}
-                                    title={color}
-                                    onClick={() => setcolor(color)}
+                                    className={`w-8 h-8 border rounded-full cursor-pointer ${color === c ? "border-3  border-gray-700 scale-105" : "border"}`}
+                                    style={{ backgroundColor: c, opacity: 0.5 }}
+                                    title={c}
+                                    onClick={() => setcolor(c)}
 
                                 />
                             ))}
@@ -162,9 +165,9 @@ function ProductView() {
 
                         <p className="font-medium">Select Size</p>
                         <div className="flex gap-3 py-2">
-                            {product.sizes.map((size) => (
-                                <p key={size} onClick={() => setsize(size)} className="px-4 py-2 border rounded-sm uppercase">
-                                    {size}
+                            {product.sizes.map((s) => (
+                                <p key={s} onClick={() => setsize(s)} className={`px-4 py-2 border rounded-sm uppercase cursor-pointer ${size === s ? "border-3  border-gray-700 scale-105" : "border"}`}>
+                                    {s}
 
                                 </p>
                             ))}

@@ -70,7 +70,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="w-screen sm:flex mb-66">
+    <div className="w-screen sm:flex mb-96 min-h-screen">
       {/* Cart Items */}
       <section className="sm:w-[70%] grid sm:grid-cols-2 grid-cols-1 gap-2 sm:p-6 p-2">
         {cartitems.map((data) => (

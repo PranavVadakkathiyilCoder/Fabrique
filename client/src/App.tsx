@@ -24,10 +24,12 @@ import ProtectedRoute from './components/ProtectedRoute'
 import {Toaster} from 'react-hot-toast'
 import PublicRoute from './components/PublicRoute'
 import AddProduct from './components/seller/AddProduct'
+import ScrollToTop from './components/ScrollerTop'
 const App = () => {
   return (
     <>
       <Toaster/>
+      <ScrollToTop/>
       <Routes >
         <Route element={<PublicRoute/>}>
           <Route path="/auth" element={<Auth/>} />

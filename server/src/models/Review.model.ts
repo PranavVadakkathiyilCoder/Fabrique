@@ -17,7 +17,7 @@ const reviewSchema = new Schema<IReview>(
     review: { type: String, required: true },
   },
   {
-    timestamps: true, // createdAt, updatedAt
+    timestamps: true, 
   }
 );
 

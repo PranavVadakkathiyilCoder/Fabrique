@@ -14,7 +14,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ _id,name, price, oldprice, im
       <Link to={`/product/${_id}`}>
       <section className='col-span-1 border border-gray-100 flex flex-col '>
 
-        <img src={image} alt="img" className=' w-full  bg-gray-100 rounded-xl p-1' />
+        <img src={image} alt="img" className=' w-full  bg-gray-100 rounded-xl p-1 ' />
 
         <div className='w-full font-text  text-center p-3'>
           <p className='text-xl '>{name}</p>

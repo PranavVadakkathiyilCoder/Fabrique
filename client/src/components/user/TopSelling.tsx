@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import ProductCard from "./ProductCard"
 import { TopSellingProduct } from "../../apis/productapi"
 import ProductCardLoading from '../Loading/ProductCardLoading'
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   _id: string;
@@ -14,6 +15,7 @@ interface Product {
 const TopSelling = () => {
   const [products, setproducts] = useState<Product[]>([])
       const [loading, setLoading] = useState(true)
+      const navigate = useNavigate()
   
   useEffect(() => {
     const getProduct = async()=>{
@@ -54,7 +56,7 @@ const TopSelling = () => {
   </div>
 
   <div className="pt-6">
-    <button className="border border-gray-300 px-14 py-3 text-base sm:text-lg font-semibold font-text rounded-xl hover:scale-105 transition-transform duration-200 ease-in-out">
+    <button onClick={()=>navigate('/products')} className="border border-gray-300 px-14 py-3 text-base sm:text-lg font-semibold font-text rounded-xl hover:scale-105 transition-transform duration-200 ease-in-out">
       View All
     </button>
   </div>

@@ -66,9 +66,13 @@ const AllProducts = () => {
             try {
                 setLoading(true);
                 const { category } = product;
-                if (!category) return;
-                const res = await SearchProducts(category);
-                setProducts(res.data.products);
+                if (category) {
+                    const res = await SearchProducts(category);
+                    setProducts(res.data.products);
+                } else {
+                    const res = await GetAllProduct();
+                    setProducts(res.data.products);
+                }
             } catch (error) {
                 console.log("Error fetching search results", error);
                 localStorage.clear()
@@ -114,7 +118,7 @@ const AllProducts = () => {
 
     return (
         <>
-            <div className="mb-20">
+            <div className="min-h-screen">
                 <section>
                     <button
                         onClick={() => setfilter(!filter)}

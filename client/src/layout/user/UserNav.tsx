@@ -9,6 +9,7 @@ import { getCurrentUserInfo, Logout } from "../../apis/authapi";
 
 const navLinks = [
   { name: "Home", path: "/" },
+  { name: "All Products", path: "/products" },
   { name: "New Arrivals", path: "/products/NewArrivels" },
   { name: "Top Sellings", path: "/products/TopSelling" },
   { name: "Accessories", path: "/products/Accessories" },

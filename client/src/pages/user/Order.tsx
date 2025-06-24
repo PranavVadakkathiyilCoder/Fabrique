@@ -53,7 +53,7 @@ const OrdersList = () => {
       ) : orders.length === 0 ? (
         <div className="text-center text-gray-500 text-lg">No orders found.</div>
       ) : (
-        <div className="grid sm:grid-cols-3 grid-cols-1 gap-4">
+        <div className="grid sm:grid-cols-4 grid-cols-1 gap-4">
           {orders.map((order) =>
             order.items.map((item, idx) => (
               <OrderCard key={`${order._id}-${idx}`} item={item} order={order} />

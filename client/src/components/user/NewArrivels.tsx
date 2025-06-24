@@ -56,7 +56,7 @@ const NewArrivels = () => {
       </div>
 
       <div className="pt-6">
-        <button className="border border-gray-300 px-14 py-3 text-base sm:text-lg font-semibold font-text rounded-xl hover:scale-105 transition-transform duration-200 ease-in-out">
+        <button onClick={()=>navigate('/products')} className="border border-gray-300 px-14 py-3 text-base sm:text-lg font-semibold font-text rounded-xl hover:scale-105 transition-transform duration-200 ease-in-out">
           View All
         </button>
       </div>
