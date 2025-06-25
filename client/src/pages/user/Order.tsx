@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import OrderCard from "../../components/user/OrderCard";
 import OrderCardLoading from "../../components/Loading/OrderCardLoading";
 import { GetUserOrder } from "../../apis/order";
+import { BsFillChatDotsFill } from "react-icons/bs";
+import { AiTwotonePrinter } from "react-icons/ai";
 
 interface OrderItem {
   product: string;
@@ -10,16 +12,25 @@ interface OrderItem {
   amount: number;
   size: string;
   color: string;
+  
   Orderstatus: string;
   paymentStatus: string;
   paymentMode: string;
+  productcount: number;
 }
 
 interface Order {
   _id: string;
   createdAt: string;
   totalAmount: number;
+  subtotal: number;
+  discount:number;
+  deliveryFee: number;
   items: OrderItem[];
+  name: string;
+  address: string;
+  phone: number;
+  pincode: number;
 }
 
 const OrdersList = () => {
@@ -30,9 +41,11 @@ const OrdersList = () => {
     const getuserorders = async () => {
       try {
         const res = await GetUserOrder();
+        console.log(res.data.orders);
+        
         setOrders(res.data.orders);
       } catch (error) {
-        console.log("Order", error);
+        console.log("Order fetch error", error);
       } finally {
         setLoading(false);
       }
@@ -41,8 +54,8 @@ const OrdersList = () => {
   }, []);
 
   return (
-    <div className="p-6 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-6">Your Orders</h2>
+    <div className="p-6 min-h-screen bg-gray-50">
+      <h2 className="text-3xl font-bold mb-6 text-gray-800">Your Orders</h2>
 
       {loading ? (
         <div className="grid sm:grid-cols-3 grid-cols-1 gap-4">
@@ -51,14 +64,72 @@ const OrdersList = () => {
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <div className="text-center text-gray-500 text-lg">No orders found.</div>
+        <div className="text-center text-gray-500 text-lg">
+          No orders found.
+        </div>
       ) : (
-        <div className="grid sm:grid-cols-4 grid-cols-1 gap-4">
-          {orders.map((order) =>
-            order.items.map((item, idx) => (
-              <OrderCard key={`${order._id}-${idx}`} item={item} order={order} />
-            ))
-          )}
+        <div className="space-y-8">
+          {orders.map((order) => (
+            <div
+              key={order._id}
+              className="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 border-b border-gray-300 pb-3">
+                <div>
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-semibold text-gray-700">Order ID:</span> #{order._id.slice(0, 6)}
+                  </p>
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-semibold text-gray-700">Placed on:</span>{" "}
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="mt-3 sm:mt-0">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold">Delivery Address:</span> {order.address},{" "}
+                    {order.pincode}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold">Phone:</span> {order.phone}
+                  </p>
+                </div>
+              </div>
+
+              {/* Items */}
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                {order.items.map((item, idx) => (
+                  <OrderCard key={`${order._id}-${idx}`} item={item} order={order} />
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="flex flex-col sm:flex-row sm:justify-end border-t  border-gray-300 pt-4 mt-4 text-sm text-gray-700 gap-2 sm:gap-8">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full text-xs hover:bg-gray-800 transition-all duration-150">
+                  <BsFillChatDotsFill className="text-sm" />
+                  Chat Store
+                </button>
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full text-xs hover:bg-gray-800 transition-all duration-150">
+                  <AiTwotonePrinter  className="text-sm" />
+                  Invoice Download
+                </button>
+                
+                <p>
+                  <span className="font-medium">Subtotal:</span> ₹{order.subtotal}
+                </p>
+                <p>
+                  <span className="font-medium">Delivery Fee:</span> ₹{order.deliveryFee}
+                </p>
+                 <p>
+                  <span className="font-medium">Discount:</span> {order.discount}%
+                </p>
+                <p className="font-bold text-lg text-black">
+                  Total: ₹{order.totalAmount}
+                </p>
+              </div>
+            </div>
+          ))}
+
         </div>
       )}
     </div>

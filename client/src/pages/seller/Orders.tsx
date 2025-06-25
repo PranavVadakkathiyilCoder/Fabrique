@@ -130,7 +130,7 @@ Total: ₹${order.totalAmount}
   return (
     <div className="w-full px-4 py-10 bg-gradient-to-b from-gray-50 to-white min-h-screen">
       <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center tracking-tight">
-        🧾 Your Seller Orders
+        🧾 Your Orders
       </h2>
 
       <div className="space-y-8 max-w-7xl mx-auto">

@@ -27,7 +27,9 @@ export interface IOrder extends Document {
   phone: number;
   subtotal: number;
   deliveryFee: number;
+  discount:number;
   totalAmount: number;
+
 }
 
 const orderItemSchema = new Schema<OrderItem>(
@@ -67,6 +69,7 @@ const orderSchema = new Schema<IOrder>(
     phone: { type: Number, required: true },
     subtotal: { type: Number, required: true },
     deliveryFee: { type: Number, default: 40 },
+    discount: { type: Number },
     totalAmount: { type: Number, required: true },
   },
   { timestamps: true }

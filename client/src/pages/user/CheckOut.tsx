@@ -3,7 +3,11 @@ import { FaArrowRight } from "react-icons/fa";
 import { gettotalamount, OrderCOD, RazorpayCOD } from "../../apis/order";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import {VerifyPayment} from '../../apis/order'
+import { Loader2 } from "lucide-react"
+import { LuTag } from "react-icons/lu";
+
+import { VerifyPayment } from '../../apis/order'
+import { ValidateCoupon } from "../../apis/Couponapi";
 const Order = () => {
   const [orderSummary, setOrderSummary] = useState({
     totalAmount: 0,
@@ -17,6 +21,11 @@ const Order = () => {
   const [pincode, setPincode] = useState("");
   const [totalamount, settotelamount] = useState(0);
   const [paymentMode, setPaymentMode] = useState<"cod" | "online" | "">("");
+  const [coupon, setcoupon] = useState("")
+  const [couponloading, setcouponloading] = useState(false)
+  const [promodiscount, setpromodiscount] = useState(0)
+  const [couponInfo, setcouponInfo] = useState("")
+
   const navigate = useNavigate();
 
   const successmsg = (msg: string) => {
@@ -38,14 +47,43 @@ const Order = () => {
       const res = await gettotalamount();
       if (res.data.success) {
         const { totalAmount, offer, deliveryFee } = res.data;
-        console.log(res.data,"fees");
-        
+        console.log(res.data, "fees");
+
         setOrderSummary({ totalAmount, offer, deliveryFee });
         settotelamount(totalAmount + deliveryFee - offer);
       }
     };
     Gettotalamount();
   }, []);
+  const CheckCoupon = async (coupon: string) => {
+    try {
+      if (!coupon) { errmsg("Add Coupon code"); return }
+      setcouponloading(true)
+      const res = await ValidateCoupon(coupon)
+      console.log(res.data);
+      setcouponInfo(res.data.couponInfo)
+
+      if (res.data.success) {
+        setcouponloading(false)
+        setpromodiscount(res.data.discount)
+        successmsg(res.data.message)
+      }
+      else {
+        errmsg(res.data.message)
+      }
+    } catch (error) {
+      setcouponloading(false)
+
+
+      errmsg("Not a Valid Coupon");
+      console.log(error);
+
+    }
+    finally {
+      setcouponloading(false)
+    }
+
+  }
 
   const createorder = async () => {
     if (!name || !address || !phone || !pincode || !paymentMode) {
@@ -60,7 +98,8 @@ const Order = () => {
       pincode: Number(pincode),
       paymentMode,
       totalAmount: totalamount,
-      // <-- new
+      offerId: couponInfo,
+
     };
 
 
@@ -91,7 +130,7 @@ const Order = () => {
             name: "FABRIQUE.CO",
             description: "Complete your purchase",
             order_id: razorpayOrder.id,
-            handler: async function(response: any) {
+            handler: async function (response: any) {
               try {
                 const verifyRes = await VerifyPayment({
                   razorpay_order_id: response.razorpay_order_id,
@@ -104,6 +143,7 @@ const Order = () => {
                   navigate("/order");
                 } else {
                   errmsg("❌ Payment verification failed");
+                  navigate("/order");
                 }
               } catch (error) {
                 console.error("Verification Error:", error);
@@ -131,6 +171,7 @@ const Order = () => {
       errmsg("Server error. Please try again.");
     }
   };
+  const discount = promodiscount > 0 ? Math.round(orderSummary.totalAmount * (promodiscount / 100)) : 0;
 
   return (
     <>
@@ -233,7 +274,7 @@ const Order = () => {
               Subtotal <span className="text-black font-medium">₹{orderSummary.totalAmount}</span>
             </p>
             <p className="flex justify-between text-gray-500">
-              Discount <span className="text-red-500 font-medium">- ₹{orderSummary.offer}</span>
+              Discount <span className="text-red-500 font-medium">- ₹{discount}</span>
             </p>
             <p className="flex justify-between text-gray-500">
               Delivery Fee <span className="text-black font-medium">₹{orderSummary.deliveryFee}</span>
@@ -243,8 +284,31 @@ const Order = () => {
           <hr className="my-4" />
 
           <p className="flex justify-between font-semibold text-lg">
-            Total <span>₹{orderSummary.totalAmount + orderSummary.deliveryFee - orderSummary.offer}</span>
+            Total <span>₹{orderSummary.totalAmount + orderSummary.deliveryFee - discount}</span> {/*- discount*/}
           </p>
+          <div className="mt-4 flex gap-2">
+            <div className="flex items-center border border-gray-300 rounded-full px-3 py-1 w-full">
+              <LuTag className="text-gray-400 mr-2" />
+              <input
+                type="text"
+                value={coupon}
+                placeholder="Add Promo code"
+                className="flex-grow outline-none bg-transparent text-sm"
+                onChange={(e) => setcoupon(e.target.value)}
+              />
+            </div>
+            <button
+              onClick={() => CheckCoupon(coupon)}
+              className="px-4 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-800"
+            >
+              {
+                couponloading ? (<Loader2 />) : (
+                  "Submit"
+                )
+              }
+
+            </button>
+          </div>
 
           <button
             onClick={createorder}

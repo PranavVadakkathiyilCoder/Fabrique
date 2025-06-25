@@ -18,6 +18,7 @@ const OrderCOD = async (orderDetails: {
   pincode: number;
   paymentMode: "cod" | "online";
   totalAmount: number;
+  offerId:string;
 }) => {
   return axios.post("/order/placeordercod", orderDetails);
 };

@@ -103,14 +103,15 @@ const verifyCoupon = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    existing.usageCount += 1;
-    existing.usedBy.push(userId);
-    await existing.save();
+    //existing.usageCount += 1;
+    //existing.usedBy.push(userId);
+    //await existing.save();
 
      res.status(200).json({
       success: true,
-      message: "Coupon is valid",
-      discount: existing.offer || 0,
+      message: "Coupon Added to Orders",
+      discount: existing.offer  || 0,
+      couponInfo :existing._id,
     });
     return
   } catch (err) {

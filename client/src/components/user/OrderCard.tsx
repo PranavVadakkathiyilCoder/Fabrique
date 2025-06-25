@@ -12,6 +12,7 @@ interface OrderItemProps {
     amount: number;
     size: string;
     color: string;
+    productcount:number;
     Orderstatus: string;
     paymentStatus: string;
     paymentMode: string;
@@ -101,7 +102,9 @@ const OrderCard: React.FC<OrderItemProps> = ({ item, order }) => {
             Color: <span className="capitalize text-gray-700">{item.color}</span> | Size:{" "}
             <span className="uppercase text-gray-700">{item.size}</span>
           </p>
-          <p className="text-sm text-gray-600">Amount: ₹{item.amount}</p>
+          
+          <p className="text-sm text-gray-600">Qty: {item.productcount}</p>
+          <p className="text-sm text-gray-600">Amount: ₹{item.amount * item.productcount}</p>
           <p className="text-sm">
             Payment: <span className="capitalize">{item.paymentMode}</span> —{" "}
             <span className={`${paymentColor} capitalize font-medium`}>
@@ -122,10 +125,7 @@ const OrderCard: React.FC<OrderItemProps> = ({ item, order }) => {
             </span>
           </div>
 
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full text-xs hover:bg-gray-800 transition-all duration-150">
-            <BsFillChatDotsFill className="text-sm" />
-            Chat Store
-          </button>
+          
         </div>
 
         {/* Feedback Form */}

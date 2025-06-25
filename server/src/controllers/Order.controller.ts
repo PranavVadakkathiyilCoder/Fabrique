@@ -4,6 +4,7 @@ import Order, { IOrder } from "../models/Order.model";
 import Cart from "../models/Cart.model";
 import razorpay from "../config/Razorpay";
 import crypto from "crypto";
+import Coupon from "../models/Coupon.model";
 
 interface AuthRequest extends Request {
   user_info?: { _id: string };
@@ -14,7 +15,7 @@ interface AuthRequest extends Request {
 // ------------------------------
 const createOrderCOD = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, address, pincode, phone, paymentMode } = req.body;
+    const { name, address, pincode, phone, paymentMode, offerId } = req.body;
 
     if (!req.user_info) {
       res.status(401).json({ message: "Unauthorized" });
@@ -57,15 +58,31 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
     }
 
     const createdOrders = [];
-
+    let subtotal = 0;
     for (const group of groupedCart) {
-      let subtotal = 0;
       for (const item of group.items) {
         subtotal += item.amount * item.productcount;
       }
 
       const deliveryFee = 40;
-      const totalAmount = subtotal + deliveryFee;
+      let discountValue = 0;
+      let constdiscount ;
+      if (offerId) {
+        const coupon = await Coupon.findById(offerId);
+        if (coupon) {
+          discountValue = Math.round((subtotal * coupon.offer) / 100);
+          constdiscount=coupon.offer
+          coupon.usageCount += 1;
+          coupon.usedBy.push(req.user_info._id);
+          await coupon.save();
+        }
+      }
+
+      const totalAmount = subtotal + deliveryFee - discountValue;
+      
+      //const discountPercent = Math.round(
+      //  ((subtotal - paidAmountWithoutDelivery) / subtotal) * 100
+      //);
 
       const order = await Order.create({
         name,
@@ -81,6 +98,7 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
         })),
         subtotal,
         deliveryFee,
+        discount: constdiscount,
         totalAmount,
       });
 
@@ -107,7 +125,7 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
 // ------------------------------
 const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, address, pincode, phone, paymentMode } = req.body;
+    const { name, address, pincode, phone, paymentMode, offerId } = req.body;
 
     if (!req.user_info) {
       res.status(401).json({ message: "Unauthorized" });
@@ -149,15 +167,29 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    let totalAmount = 0;
+    let grandSubtotal = 0;
     for (const group of groupedCart) {
       for (const item of group.items) {
-        totalAmount += item.amount * item.productcount;
+        grandSubtotal += item.amount * item.productcount;
+      }
+    }
+    let deliveryFee = 40;
+    let discountValue = 0;
+    if (offerId) {
+      const coupon = await Coupon.findById(offerId);
+      if (coupon) {
+        discountValue = Math.round((grandSubtotal * coupon.offer) / 100);
+        coupon.usageCount += 1;
+        coupon.usedBy.push(req.user_info._id);
+        await coupon.save();
       }
     }
 
+    const finalPayableAmount = grandSubtotal + deliveryFee - discountValue;
+    console.log(grandSubtotal,discountValue);
+    
     const razorpayorder = await razorpay.orders.create({
-      amount: Math.round(totalAmount * 100),
+      amount: finalPayableAmount * 100,
       currency: "INR",
       receipt: `receipt_${Date.now()}`,
       notes: { userId: req.user_info._id.toString() },
@@ -171,8 +203,11 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
         subtotal += item.amount * item.productcount;
       }
 
-      const deliveryFee = 40;
-      const totalAmountPerGroup = subtotal + deliveryFee;
+      const totalAmount = subtotal + deliveryFee - discountValue;
+      const paidAmountWithoutDelivery = totalAmount - deliveryFee;
+      const discountPercent = Math.round(
+        ((subtotal - paidAmountWithoutDelivery) / subtotal) * 100
+      );
 
       const order = await Order.create({
         name,
@@ -189,7 +224,8 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
         })),
         subtotal,
         deliveryFee,
-        totalAmount: totalAmountPerGroup,
+        discount: discountPercent,
+        totalAmount,
       });
 
       createdOrders.push(order);
@@ -206,7 +242,6 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
         key_id: process.env.RAZORPAY_KEY_ID,
       },
     });
-    return;
   } catch (error) {
     console.error("Order creation error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -219,7 +254,8 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
 // ------------------------------
 const verifyRazorpayPayment = async (req: Request, res: Response) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
 
     const generated_signature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
@@ -227,7 +263,10 @@ const verifyRazorpayPayment = async (req: Request, res: Response) => {
       .digest("hex");
 
     if (generated_signature !== razorpay_signature) {
-      res.status(400).json({ success: false, message: "Payment verification failed" });
+      res
+        .status(400)
+        .json({ success: false, message: "Payment verification failed" });
+      await Order.deleteOne({ razorpayOrderId: razorpay_order_id });
       return;
     }
 
@@ -245,7 +284,9 @@ const verifyRazorpayPayment = async (req: Request, res: Response) => {
       }
     );
 
-    res.status(200).json({ success: true, message: "Payment verified successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Payment verified successfully" });
     return;
   } catch (err) {
     console.error("Verification Error:", err);
@@ -300,7 +341,6 @@ const getCartTotalAmount = async (req: AuthRequest, res: Response) => {
     return;
   }
 };
-
 
 const getUserOrders = async (req: AuthRequest, res: Response) => {
   try {
@@ -377,68 +417,75 @@ const getSellerOrders = async (req: AuthRequest, res: Response) => {
     return;
   } catch (error: any) {
     console.error("Error fetching seller orders:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
     return;
   }
 };
 
-
- const updateOrderItemStatus = async (req: Request, res: Response) => {
+const updateOrderItemStatus = async (req: Request, res: Response) => {
   try {
-    
-    const { orderId,productId, sellerId, status } = req.body;
+    const { orderId, productId, sellerId, status } = req.body;
 
     const validStatuses = [
-      'Pending',
-      'Confirmed',
-      'Dispatched',
-      'In Transit',
-      'Out for Delivery',
-      'Delivered',
+      "Pending",
+      "Confirmed",
+      "Dispatched",
+      "In Transit",
+      "Out for Delivery",
+      "Delivered",
     ];
 
     if (!validStatuses.includes(status)) {
-       res.status(400).json({ message: 'Invalid status value' }); return
+      res.status(400).json({ message: "Invalid status value" });
+      return;
+    }
+
+    const updateFields: any = {
+      "items.$[elem].Orderstatus": status,
+    };
+
+    // Also update paymentStatus if delivered
+    if (status === "Delivered") {
+      updateFields["items.$[elem].paymentStatus"] = "completed";
     }
 
     const updatedOrder = await Order.findOneAndUpdate(
       {
         _id: orderId,
-        'items.product': productId,
-        'items.seller': sellerId,
+        "items.product": productId,
+        "items.seller": sellerId,
       },
       {
-        $set: {
-          'items.$[elem].Orderstatus': status,
-        },
+        $set: updateFields,
       },
       {
         new: true,
         arrayFilters: [
           {
-            'elem.product': productId,
-            'elem.seller': sellerId,
+            "elem.product": productId,
+            "elem.seller": sellerId,
           },
         ],
       }
     );
 
     if (!updatedOrder) {
-       res.status(404).json({ message: 'Order or item not found' }); return
+      res.status(404).json({ message: "Order or item not found" });
+      return;
     }
 
-     res.status(200).json({
-      success:true,
-      message: 'Order status updated successfully',
+    res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
       updatedOrder,
     });
   } catch (error) {
-    console.error('Order status update error:', error);
-     res.status(500).json({ message: 'Internal server error' });
+    console.error("Order status update error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 export {
   createOrderCOD,
@@ -447,5 +494,5 @@ export {
   getCartTotalAmount,
   getUserOrders,
   getSellerOrders,
-  updateOrderItemStatus
+  updateOrderItemStatus,
 };
