@@ -10,9 +10,7 @@ interface AuthRequest extends Request {
   user_info?: { _id: string };
 }
 
-// ------------------------------
-// COD Order Creation
-// ------------------------------
+
 const createOrderCOD = async (req: AuthRequest, res: Response) => {
   try {
     const { name, address, pincode, phone, paymentMode, offerId } = req.body;
@@ -52,16 +50,19 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
       },
     ]);
 
+    console.log("gcart",groupedCart);
+    
     if (!groupedCart.length) {
       res.status(400).json({ message: "Cart is empty" });
       return;
     }
 
     const createdOrders = [];
-    let subtotal = 0;
+    
     for (const group of groupedCart) {
+      let subtotal = 0;
       for (const item of group.items) {
-        subtotal += item.amount * item.productcount;
+        subtotal += item.amount ;
       }
 
       const deliveryFee = 40;

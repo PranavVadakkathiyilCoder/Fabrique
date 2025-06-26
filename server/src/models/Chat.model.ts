@@ -3,7 +3,7 @@ import { Schema, model, Document, Types, models } from "mongoose";
 export interface IChat extends Document {
   users: Types.ObjectId[];
   order: Types.ObjectId;
-  latestmessage: Types.ObjectId;
+  latestMessage: Types.ObjectId;
   review: string;
 }
 
@@ -11,7 +11,7 @@ const chatSchema = new Schema<IChat>(
   {
     users: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
     order: { type: Schema.Types.ObjectId, ref: "Order", required: true },
-    latestmessage :{type:Schema.Types.ObjectId,ref:"Message",}
+    latestMessage :{type:Schema.Types.ObjectId,ref:"Message",},
     
   },
   {

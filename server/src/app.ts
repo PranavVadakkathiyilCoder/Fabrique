@@ -36,6 +36,12 @@ import ReviewRoute from "./routes/Review.route";
 
 import CouponRoute from './routes/Coupon.route'
 
+import ChatRoute from './routes/Chat.route'
+
+import MessageRoute from './routes/Message.route'
+
+
+
 app.use('/api/v1/user',AuthRoute)
 
 app.use('/api/v1/product',ProductRoute)
@@ -47,6 +53,11 @@ app.use('/api/v1/order',OrderRoute)
 app.use('/api/v1/review',ReviewRoute)
 
 app.use('/api/v1/coupon',CouponRoute)
+
+app.use('/api/v1/chat',ChatRoute)
+
+app.use('/api/v1/message',MessageRoute)
+
 
 
 app.use(passport.initialize());

@@ -4,6 +4,7 @@ import OrderCardLoading from "../../components/Loading/OrderCardLoading";
 import { GetUserOrder } from "../../apis/order";
 import { BsFillChatDotsFill } from "react-icons/bs";
 import { AiTwotonePrinter } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 interface OrderItem {
   product: string;
@@ -12,7 +13,7 @@ interface OrderItem {
   amount: number;
   size: string;
   color: string;
-  
+  seller:string;
   Orderstatus: string;
   paymentStatus: string;
   paymentMode: string;
@@ -37,6 +38,8 @@ const OrdersList = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     const getuserorders = async () => {
       try {
@@ -52,6 +55,11 @@ const OrdersList = () => {
     };
     getuserorders();
   }, []);
+  const handleInvoice = (order:Order) => {
+    navigate("/invoice", { state: { order } });
+    console.log("hi");
+    
+  };
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
@@ -105,12 +113,9 @@ const OrdersList = () => {
 
               {/* Footer */}
               <div className="flex flex-col sm:flex-row sm:justify-end border-t  border-gray-300 pt-4 mt-4 text-sm text-gray-700 gap-2 sm:gap-8">
+                
                 <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full text-xs hover:bg-gray-800 transition-all duration-150">
-                  <BsFillChatDotsFill className="text-sm" />
-                  Chat Store
-                </button>
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full text-xs hover:bg-gray-800 transition-all duration-150">
-                  <AiTwotonePrinter  className="text-sm" />
+                  <AiTwotonePrinter onClick={()=>handleInvoice(order)}    className="text-sm" />
                   Invoice Download
                 </button>
                 
@@ -121,7 +126,7 @@ const OrdersList = () => {
                   <span className="font-medium">Delivery Fee:</span> ₹{order.deliveryFee}
                 </p>
                  <p>
-                  <span className="font-medium">Discount:</span> {order.discount}%
+                  <span className="font-medium">Discount:</span> {order.discount ? order.discount : 0}%
                 </p>
                 <p className="font-bold text-lg text-black">
                   Total: ₹{order.totalAmount}

@@ -26,6 +26,7 @@ import PublicRoute from './components/PublicRoute'
 import AddProduct from './components/seller/AddProduct'
 import ScrollToTop from './components/ScrollerTop'
 import Coupon from './pages/admin/Coupon'
+import Invoice from './components/user/Invoice'
 const App = () => {
   return (
     <>
@@ -46,6 +47,7 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckOut />} />
           <Route path="/order" element={<OrdersList />} />
+          <Route path="/invoice" element={<Invoice />} />
         </Route>
         </Route>
 
