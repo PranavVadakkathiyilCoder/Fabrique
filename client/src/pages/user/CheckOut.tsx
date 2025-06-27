@@ -25,6 +25,7 @@ const Order = () => {
   const [couponloading, setcouponloading] = useState(false)
   const [promodiscount, setpromodiscount] = useState(0)
   const [couponInfo, setcouponInfo] = useState("")
+  const [orderloading, setorderloading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -90,6 +91,7 @@ const Order = () => {
       errmsg("All fields are required");
       return;
     }
+    setorderloading(true)
 
     const orderDetails = {
       name,
@@ -110,9 +112,12 @@ const Order = () => {
         const res = await OrderCOD(orderDetails);
         if (res.data.success) {
           successmsg(res.data.message);
+          setorderloading(false)
           navigate("/order");
         } else {
           errmsg("Order failed. Try again later.");
+          setorderloading(false)
+
         }
       } else {
         const res = await RazorpayCOD(orderDetails);
@@ -140,13 +145,19 @@ const Order = () => {
 
                 if (verifyRes.data.success) {
                   successmsg("✅ Payment verified & order confirmed");
+          setorderloading(false)
+
                   navigate("/order");
                 } else {
                   errmsg("❌ Payment verification failed");
+          setorderloading(false)
+
                   navigate("/order");
                 }
               } catch (error) {
                 console.error("Verification Error:", error);
+          setorderloading(false)
+
                 errmsg("⚠️ Payment verification error");
               }
             },
@@ -314,7 +325,14 @@ const Order = () => {
             onClick={createorder}
             className="w-full mt-6 py-3 rounded-full bg-black text-white flex items-center justify-center gap-2 hover:bg-gray-800 transition"
           >
-            Checkout <FaArrowRight />
+            {
+                orderloading ? (<Loader2 />) : (
+                 <>
+                 Checkout <FaArrowRight />
+                 </> 
+                )
+              }
+             
           </button>
         </div>
       </div>

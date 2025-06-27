@@ -5,11 +5,11 @@ import Cart from "../models/Cart.model";
 import razorpay from "../config/Razorpay";
 import crypto from "crypto";
 import Coupon from "../models/Coupon.model";
-
+import nodemailer from "nodemailer";
+import { sendOrderConfirmationEmail } from "../config/Nodemailer";
 interface AuthRequest extends Request {
-  user_info?: { _id: string };
+  user_info?: { _id: string; email: string };
 }
-
 
 const createOrderCOD = async (req: AuthRequest, res: Response) => {
   try {
@@ -50,29 +50,29 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
       },
     ]);
 
-    console.log("gcart",groupedCart);
-    
+    console.log("gcart", groupedCart);
+
     if (!groupedCart.length) {
       res.status(400).json({ message: "Cart is empty" });
       return;
     }
 
     const createdOrders = [];
-    
+
     for (const group of groupedCart) {
       let subtotal = 0;
       for (const item of group.items) {
-        subtotal += item.amount ;
+        subtotal += item.amount;
       }
 
       const deliveryFee = 40;
       let discountValue = 0;
-      let constdiscount ;
+      let constdiscount;
       if (offerId) {
         const coupon = await Coupon.findById(offerId);
         if (coupon) {
           discountValue = Math.round((subtotal * coupon.offer) / 100);
-          constdiscount=coupon.offer
+          constdiscount = coupon.offer;
           coupon.usageCount += 1;
           coupon.usedBy.push(req.user_info._id);
           await coupon.save();
@@ -80,7 +80,7 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
       }
 
       const totalAmount = subtotal + deliveryFee - discountValue;
-      
+
       //const discountPercent = Math.round(
       //  ((subtotal - paidAmountWithoutDelivery) / subtotal) * 100
       //);
@@ -107,6 +107,21 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
     }
 
     await Cart.deleteMany({ user: req.user_info._id });
+    const allItems = createdOrders.flatMap((order) => order.items);
+
+    await sendOrderConfirmationEmail({
+      name,
+      address,
+      pincode,
+      phone,
+      paymentMode,
+      email: req.user_info.email,
+      items: allItems,
+      totalAmount: createdOrders.reduce(
+        (sum, order) => sum + order.totalAmount,
+        0
+      ),
+    });
 
     res.status(201).json({
       success: true,
@@ -187,8 +202,8 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
     }
 
     const finalPayableAmount = grandSubtotal + deliveryFee - discountValue;
-    console.log(grandSubtotal,discountValue);
-    
+    console.log(grandSubtotal, discountValue);
+
     const razorpayorder = await razorpay.orders.create({
       amount: finalPayableAmount * 100,
       currency: "INR",
@@ -233,7 +248,21 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
     }
 
     await Cart.deleteMany({ user: req.user_info._id });
+    const allItems = createdOrders.flatMap((order) => order.items);
 
+    await sendOrderConfirmationEmail({
+      name,
+      address,
+      pincode,
+      phone,
+      paymentMode,
+      email: req.user_info.email,
+      items: allItems,
+      totalAmount: createdOrders.reduce(
+        (sum, order) => sum + order.totalAmount,
+        0
+      ),
+    });
     res.status(201).json({
       success: true,
       message: "Orders placed successfully",
