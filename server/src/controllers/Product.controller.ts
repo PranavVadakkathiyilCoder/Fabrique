@@ -6,6 +6,7 @@ import { resolveSoa } from "dns";
 import Order from "../models/Order.model";
 import Review from "../models/Review.model";
 import User from "../models/User.model";
+import { log } from "console";
 interface AuhtRequest extends Request {
   user_info?: any;
 }
@@ -167,15 +168,34 @@ const Accessories = async (req: AuhtRequest, res: Response) => {
 };
 const AllProducts = async (req: AuhtRequest, res: Response) => {
   try {
-    const products = await Product.find({});
+   const limit = parseInt((req.query.limit as string) || '10', 10);
+    const page = parseInt((req.query.page as string) || '0', 0);
+    
+    
+    
+    if(isNaN(limit) || isNaN(page)){
+       res.status(400).json({ success: false, message: "Not limt and page" });
+      return;
+    }
+    
+    const products = await Product.find({}).limit(limit).skip(page*limit);
+    
+    
     if (!products) {
       res.status(400).json({ success: false, message: "Not Products" });
       return;
     }
+    const counts =  await Product.countDocuments({});
     res.status(200).json({
       success: true,
       message: "Products Fetched",
       products,
+      counts,
+      page,
+      
+      
+      
+      
     });
   } catch (error) {
     console.log(error);

@@ -38,19 +38,31 @@ const AllProducts = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [selectedSelling, setSelectedSelling] = useState<string>("");
     const [selectedRating, setSelectedRating] = useState<number | null>(null);
-
+    const [count, setcount] = useState(0)
+    const [limit, setlimit] = useState(12)
+    const [page, setpage] = useState(0)
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+
 
     const product = useParams();
     const { filter, setfilter } = useNavContext();
     const navigate = useNavigate()
+
     // Fetch all products initially
     useEffect(() => {
         const getProduct = async () => {
             try {
-                const data = await GetAllProduct();
-                setProducts(data.data.products);
+                const res = await GetAllProduct(limit,page);
+                setProducts(res.data.products);
+                console.log(res.data);
+                console.log(limit,page);
+                setpage(res.data.page)
+                const totalProducts = res.data.counts;
+
+                const totalPages = Math.ceil(totalProducts / limit);
+                setcount(totalPages)
+
             } catch (error) {
                 console.log(error);
             } finally {
@@ -58,7 +70,7 @@ const AllProducts = () => {
             }
         };
         getProduct();
-    }, []);
+    }, [page]);
 
     // Fetch searched products by route param (if any)
     useEffect(() => {
@@ -70,7 +82,7 @@ const AllProducts = () => {
                     const res = await SearchProducts(category);
                     setProducts(res.data.products);
                 } else {
-                    const res = await GetAllProduct();
+                    const res = await GetAllProduct(limit,page);
                     setProducts(res.data.products);
                 }
             } catch (error) {
@@ -101,7 +113,7 @@ const AllProducts = () => {
 
             if (res.data.products.length === 0) {
                 toast.error("No products found with selected filters.");
-                const all = await GetAllProduct();
+                const all = await GetAllProduct(limit,page);
                 setProducts(all.data.products);
             } else {
                 setProducts(res.data.products);
@@ -146,7 +158,7 @@ const AllProducts = () => {
                                     setSelectedRating(null);
                                     setPrice("200");
                                     try {
-                                        const res = await GetAllProduct();
+                                        const res = await GetAllProduct(limit,page);
                                         setProducts(res.data.products);
                                     } catch (error) {
                                         console.error("Error fetching all products", error);
@@ -269,6 +281,13 @@ const AllProducts = () => {
 
                         </div>
                     </aside>
+                </section>
+                <section className="w-screen">
+                    <div className="flex items-center justify-center mb-1 gap-1">
+                        {Array.from({ length: count }).map((_, i) => (
+                            <div key={i} onClick={()=>setpage(i)} className={`border ${page === i ? "bg-blue-200":""}  cursor-pointer border-gray-300 text-gray-700 flex items-center justify-center  w-5 h-5 rounded-full`}>{i + 1}</div>
+                        ))}
+                    </div>
                 </section>
             </div>
         </>

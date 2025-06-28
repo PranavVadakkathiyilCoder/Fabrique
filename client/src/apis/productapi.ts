@@ -2,8 +2,10 @@ import axios from "./axios";
 const AddProducts = async (formData: FormData) => {
   return axios.post("/product/addproduct", formData);
 };
-const GetAllProduct = async () => {
-  return axios.get("/product/allproducts");
+const GetAllProduct = async (limit: number, page: number) => {
+  return axios.get("/product/allproducts", {
+    params: { limit, page },
+  });
 };
 const GetSellerProduct = async () => {
   return axios.get("/product/sellerproduct");
