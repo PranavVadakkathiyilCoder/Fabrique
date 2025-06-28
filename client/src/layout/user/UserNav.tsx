@@ -16,27 +16,25 @@ const navLinks = [
 ];
 
 const UserNav = () => {
-  const { userNav, setuserNav } = useNavContext();
-  const [userdata, setuserdata] = useState<any>(null);
-  const [cartCount, setcartCount] = useState(0);
+  const { userNav, setuserNav,setCartCount,cartCount,fetchUserInfo,userdata,setuserdata } = useNavContext();
+  
+  
   const [showDropdown, setShowDropdown] = useState(false);
-  const [search, setSearch] = useState<string>(""); // ✅ New state for search
+  const [search, setSearch] = useState<string>(""); 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchInfo = async () => {
       try {
-        const res = await getCurrentUserInfo();
-        setuserdata(res.data.userdata);
-        setcartCount(res.data.cartCount);
+        await fetchUserInfo();
+        
       } catch (error) {
         console.error("Error fetching user info:", error);
-        localStorage.clear()
-        navigate('/auth')
+       
 
       }
     };
-    fetchUserInfo();
+    fetchInfo();
   }, []);
 
   const handleLogout = async () => {

@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { AddToCart } from "../../apis/cartapi";
+import { useNavContext } from "../../context/NavContext";
 interface Product {
     _id: string;
     name: string;
@@ -24,6 +25,7 @@ interface Product {
 }
 
 function ProductView() {
+    const { fetchUserInfo } = useNavContext();
     const [product, setproduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [productcount, setproductcount] = useState<number>(1)
@@ -82,6 +84,7 @@ function ProductView() {
             const data = await AddToCart(payload)
             console.log(data.data);
             if(data.data.success){
+                await fetchUserInfo()
                 successmsg(data.data.message)
                 navigate('/cart')
 

@@ -1,4 +1,6 @@
 import React, { createContext, useState,useContext } from "react";
+import { getCurrentUserInfo } from "../apis/authapi";
+import { useNavigate } from "react-router-dom";
 
 type NavContextType = {
     userNav: boolean;
@@ -9,6 +11,12 @@ type NavContextType = {
     setadminNav: React.Dispatch<React.SetStateAction<boolean>>;
     filter:boolean;
     setfilter:React.Dispatch<React.SetStateAction<boolean>>
+    cartCount:number;
+    setCartCount:React.Dispatch<React.SetStateAction<number>>
+    fetchUserInfo: () => Promise<void>;
+    
+    userdata:any
+    setuserdata:React.Dispatch<React.SetStateAction<any>>;
 
 };
 
@@ -23,7 +31,25 @@ export const NavContextProvider = ({ children }: ContextProps) => {
     const [sellerNav, setsellerNav] = useState(false);
     const [adminNav, setadminNav] = useState(false);
     const [filter, setfilter] = useState(false);
+    
+    const [cartCount, setCartCount] = useState<number>(0);
+    const [userdata, setuserdata] = useState<any>(null);
+    const navigate = useNavigate()
+    const fetchUserInfo = async () => {
+    try {
+      const res = await getCurrentUserInfo(); 
+      setCartCount(res.data.cartCount);
+      console.log("hi",res.data);
+      setuserdata(res.data.userdata)
+      
+    } catch (err) {
+      console.error("Failed to fetch cart count:", err);
+     
+        localStorage.clear()
+        navigate('/auth')
 
+    }
+  };
     return (
         <NavContext.Provider
             value={{
@@ -34,7 +60,12 @@ export const NavContextProvider = ({ children }: ContextProps) => {
                 adminNav,
                 setadminNav,
                 filter,
-                setfilter
+                setfilter,
+                cartCount,
+                setCartCount,
+                fetchUserInfo,
+                userdata,
+                setuserdata,
             }}
         >
             {children}

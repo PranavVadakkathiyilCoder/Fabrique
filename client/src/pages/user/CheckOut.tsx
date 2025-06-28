@@ -277,7 +277,7 @@ const Order = () => {
         </div>
 
         {/* Right Side - Order Summary */}
-        <div className="sm:w-1/3 bg-white shadow-md rounded-2xl p-6 h-fit">
+        <div className="lg:w-[30%] w-full bg-white shadow-lg rounded-2xl p-5 sticky top-24 self-start h-fit">
           <h2 className="text-2xl font-semibold mb-4">ORDER SUMMARY</h2>
 
           <div className="space-y-2 text-sm">
