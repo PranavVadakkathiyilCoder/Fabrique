@@ -581,93 +581,26 @@ const getAllSellersWithStats = async (req: Request, res: Response) => {
 };
 const getAllProductsForAdmin = async (req: Request, res: Response) => {
   try {
-    const productDetails = await Product.aggregate([
-      // Populate seller
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'seller',
-          foreignField: '_id',
-          as: 'sellerInfo',
-        },
-      },
-      {
-        $unwind: {
-          path: '$sellerInfo',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-
-      // Lookup Reviews
-      {
-        $lookup: {
-          from: 'reviews',
-          localField: '_id',
-          foreignField: 'product',
-          as: 'productReviews',
-        },
-      },
-
-      // Lookup Orders
-      {
-        $lookup: {
-          from: 'orders',
-          let: { productId: '$_id' },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $in: ['$$productId', '$orderItems.product'],
-                },
-              },
-            },
-          ],
-          as: 'productOrders',
-        },
-      },
-
-      // Project Final Fields
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          image: { $arrayElemAt: ['$images', 0] },
-          colors: 1,
-          sizes: 1,
-          totalStock: {
-            $sum: {
-              $map: {
-                input: '$variants',
-                as: 'v',
-                in: '$$v.stock',
-              },
-            },
-          },
-          avgRating: {
-            $cond: [
-              { $gt: [{ $size: '$productReviews' }, 0] },
-              {
-                $round: [
-                  {
-                    $avg: '$productReviews.rating',
-                  },
-                  1,
-                ],
-              },
-              '0.0',
-            ],
-          },
-          reviewCount: { $size: '$productReviews' },
-          sellerName: '$sellerInfo.name',
-          orderCount: { $size: '$productOrders' },
-        },
-      },
-    ]);
-
-    res.status(200).json({ success: true, products: productDetails });
+    
+    const products = await Product.find({})
+    .populate(
+      "seller",
+      "name email pic"
+    );
+    if (!products) {
+      res.status(400).json({ success: false, message: "failed to get seller" });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Seller get successfully",
+      products,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error fetching seller products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch products. Please try again later.",
+    });
   }
 };
 

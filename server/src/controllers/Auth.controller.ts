@@ -267,6 +267,35 @@ const getCurrentUserInfo = async (req: AuhtRequest, res: Response) => {
     return;
   }
 };
+const changeRole = async (req: AuhtRequest, res: Response) => {
+  try {
+    const userId = req.user_info?._id;
+    const {id,role} = req.body;
+    if (!id||!role) {
+      res.status(401).json({ success: false, message: "User And role needed" });
+      return;
+    }
+
+    const user = await User.findById(id).select("-password")
+    if(!user){
+      res.status(401).json({ success: false, message: "User no founded" });
+      return;
+    }    
+    user.role = role
+    user.save()
+
+    
+ 
+    res.status(200).json({
+      success: true,
+      user
+    });
+  } catch (error) {
+    console.error("Error in get role change:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+    return;
+  }
+};
 
 export {
   registerUser,
@@ -277,4 +306,5 @@ export {
   logoutUser,
   getCurrentSellerInfo,
   validateuser,
+  changeRole
 };

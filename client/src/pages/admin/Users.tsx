@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { UserInfoAdmin } from '../../apis/productapi'; // Adjust path if needed
+import { changeRole } from '../../apis/authapi';
+import toast from 'react-hot-toast';
 
 interface IUser {
   _id: string;
@@ -12,18 +14,41 @@ interface IUser {
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<IUser[]>([]);
+  const [rolechange, setrolechange] = useState(false)
+  const handleRoleChange = async(id:string,role:string)=>{
+    console.log(id,role);
+    try {
+      const res = await changeRole(id,role)
+      console.log(res.data);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
+      if(res.data.success){
+        toast.success("✅ Role changed")
+        setrolechange(prev=>!prev)
+      }
+      else{
+         toast.error("❌ Error on role change")
+      }
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
+    
+  }
+  const fetchUsers = async () => {
       try {
         const res = await UserInfoAdmin();
-        setUsers(res.data.users); // assuming API returns { users: [...] }
+        setUsers(res.data.users); 
+        console.log(res.data.users);
+        
       } catch (err) {
         console.error('Failed to fetch users:', err);
       }
     };
+  useEffect(() => {
+    
     fetchUsers();
-  }, []);
+  }, [rolechange]);
 
   return (
     <div className="w-full p-4">
@@ -46,7 +71,16 @@ const Users: React.FC = () => {
               <tr key={user._id} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2 align-top">{user.name}</td>
                 <td className="border border-gray-300 px-4 py-2 align-top">{user.email}</td>
-                <td className="border border-gray-300 px-4 py-2 align-top">{user.role}</td>
+                <td className="border border-gray-300 px-4 py-2 align-top">
+                  <select
+                    value={user.role}
+                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                    className="px-2 py-1 border rounded bg-white text-sm"
+                  >
+                    <option value="user">User</option>
+                    <option value="seller">Seller</option>
+                  </select>
+                </td>
                 <td className="border border-gray-300 px-4 py-2 align-top">{user.status}</td>
                 
               </tr>

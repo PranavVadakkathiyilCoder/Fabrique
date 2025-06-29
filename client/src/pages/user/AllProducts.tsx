@@ -285,7 +285,7 @@ const AllProducts = () => {
                 <section className="w-screen">
                     <div className="flex items-center justify-center mb-1 gap-1">
                         {Array.from({ length: count }).map((_, i) => (
-                            <div key={i} onClick={()=>setpage(i)} className={`border ${page === i ? "bg-blue-200":""}  cursor-pointer border-gray-300 text-gray-700 flex items-center justify-center  w-5 h-5 rounded-full`}>{i + 1}</div>
+                            <div key={i} onClick={()=>{setpage(i); window.scrollTo({ top: 0, behavior: "smooth" });}} className={`border ${page === i ? "bg-blue-200":""}  cursor-pointer border-gray-300 text-gray-700 flex items-center justify-center  w-5 h-5 rounded-full`}>{i + 1}</div>
                         ))}
                     </div>
                 </section>

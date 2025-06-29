@@ -21,7 +21,10 @@ const getCurrentUserInfo = async () => {
 const Logout = async () => {
     return axios.post('/user/logout')
 }
+const changeRole = async (id:string,role:string) => {
+    return axios.post('/user/rolechange',{id,role})
+}
 
 
 
-export {registerUser,loginUser,validateUser,getCurrentUserInfo,Logout,getCurrentSellerInfo}
+export {registerUser,loginUser,validateUser,getCurrentUserInfo,Logout,getCurrentSellerInfo,changeRole}

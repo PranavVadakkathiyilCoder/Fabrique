@@ -186,7 +186,7 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
     let grandSubtotal = 0;
     for (const group of groupedCart) {
       for (const item of group.items) {
-        grandSubtotal += item.amount * item.productcount;
+        grandSubtotal += item.amount ;
       }
     }
     let deliveryFee = 40;
@@ -216,7 +216,7 @@ const createOrderRazorpay = async (req: AuthRequest, res: Response) => {
     for (const group of groupedCart) {
       let subtotal = 0;
       for (const item of group.items) {
-        subtotal += item.amount * item.productcount;
+        subtotal += item.amount 
       }
 
       const totalAmount = subtotal + deliveryFee - discountValue;

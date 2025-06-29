@@ -4,13 +4,13 @@ import { ProductInfoAdmin } from '../../apis/productapi';
 interface ProductType {
   _id: string;
   name: string;
-  image: string;
+  images: string;
   colors: string[];
   sizes: string[];
   totalStock: number;
   avgRating: string;
   reviewCount: number;
-  sellerName: string;
+  seller: any;
   orderCount: number;
 }
 
@@ -22,6 +22,8 @@ const ProductPage: React.FC = () => {
       try {
         const res = await ProductInfoAdmin();
         setProducts(res.data.products);
+        console.log(res.data);
+
       } catch (err) {
         console.error('Error fetching products:', err);
       }
@@ -43,9 +45,8 @@ const ProductPage: React.FC = () => {
               <th className="border border-gray-300 px-4 py-2">Colors</th>
               <th className="border border-gray-300 px-4 py-2">Sizes</th>
               <th className="border border-gray-300 px-4 py-2">Total Stock</th>
-              <th className="border border-gray-300 px-4 py-2">Reviews</th>
+              
               <th className="border border-gray-300 px-4 py-2">Seller</th>
-              <th className="border border-gray-300 px-4 py-2">Orders</th>
               
             </tr>
           </thead>
@@ -55,7 +56,7 @@ const ProductPage: React.FC = () => {
               <tr key={product._id} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2">
                   <img
-                    src={product.image}
+                    src={product.images[0]}
                     alt={product.name}
                     className="w-12 h-12 object-cover rounded bg-gray-200 p-1"
                   />
@@ -68,11 +69,21 @@ const ProductPage: React.FC = () => {
                   {product.sizes.join(', ')}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 align-top">{product.totalStock}</td>
+                
                 <td className="border border-gray-300 px-4 py-2 align-top">
-                  {product.avgRating} ⭐ ({product.reviewCount} reviews)
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={product.seller.pic}
+                      alt={product.seller.name}
+                      className="w-10 h-10 rounded-full object-cover border"
+                    />
+                    <div className="text-sm leading-tight">
+                      <div className="font-semibold text-gray-800">{product.seller.name}</div>
+                      <div className="text-gray-500 text-xs truncate max-w-[120px]">{product.seller.email}</div>
+                    </div>
+                  </div>
                 </td>
-                <td className="border border-gray-300 px-4 py-2 align-top">{product.sellerName}</td>
-                <td className="border border-gray-300 px-4 py-2 align-top">{product.orderCount} Orders</td>
+
                 
               </tr>
             ))}

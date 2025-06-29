@@ -78,7 +78,7 @@ const Chats: React.FC = () => {
       setChatPopupOpen(true);
       const res = await getMessages(chat._id);
       setMessages(res.data.messages);
-      setUserId(res.data.user); // assuming backend returns userId
+      setUserId(res.data.user); // assuming backend returns user ID
     } catch (error) {
       console.log(error);
     }
@@ -104,31 +104,38 @@ const Chats: React.FC = () => {
     <div className="w-full p-4">
       <h2 className="text-2xl font-bold mb-4">Customer Chats</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {chats.map((chat) => (
-          <div
-            key={chat._id}
-            className="border border-gray-300 rounded-lg p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition"
-          >
-            <p className="font-semibold text-gray-800">
-              Customer: <span className="text-black">{chat.order.name}</span>
-            </p>
-            <p className="text-gray-700">
-              Product: <span className="text-black">{chat.order.items[0]?.name || 'N/A'}</span>
-            </p>
-            <p className="text-gray-700 text-sm">
-              Order ID: <span className="text-black">{chat.order._id.slice(-6)}</span>
-            </p>
-            <p className="text-gray-700 text-sm">Total: ₹{chat.order.totalAmount}</p>
-            <button
-              onClick={() => handleChatClick(chat)}
-              className="mt-auto bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition text-sm"
+      {chats.length === 0 ? (
+        <div className="w-full text-center text-gray-500 py-20 text-lg font-medium">
+          🗨️ No Chats Found
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {chats.map((chat) => (
+            <div
+              key={chat._id}
+              className="border border-gray-300 rounded-lg p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition"
             >
-              View Chat
-            </button>
-          </div>
-        ))}
-      </div>
+              <p className="font-semibold text-gray-800">
+                Customer: <span className="text-black">{chat.order.name}</span>
+              </p>
+              <p className="text-gray-700">
+                Product:{' '}
+                <span className="text-black">{chat.order.items[0]?.name || 'N/A'}</span>
+              </p>
+              <p className="text-gray-700 text-sm">
+                Order ID: <span className="text-black">{chat.order._id.slice(-6)}</span>
+              </p>
+              <p className="text-gray-700 text-sm">Total: ₹{chat.order.totalAmount}</p>
+              <button
+                onClick={() => handleChatClick(chat)}
+                className="mt-auto bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition text-sm"
+              >
+                View Chat
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {chatPopupOpen && selectedChat && (
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -152,7 +159,9 @@ const Chats: React.FC = () => {
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto text-sm text-gray-700 space-y-2">
               {messages.length === 0 ? (
-                <p className="text-center text-gray-400">Start chatting with the customer...</p>
+                <p className="text-center text-gray-400">
+                  Start chatting with the customer...
+                </p>
               ) : (
                 messages.map((msg, index) => {
                   const isSender = msg.sender._id === userId;
