@@ -20,7 +20,7 @@ const NewArrivels = () => {
     const getProduct = async () => {
       try {
         const data = await NewArrivelsProduct()
-        console.log(data);
+        //console.log(data);
         setproducts(data.data.products)
       } catch (error) {
         console.log(error);

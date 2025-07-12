@@ -18,7 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ _id,name, price, oldprice, im
 
         <div className='w-full font-text  text-center p-3'>
           <p className='text-xl '>{name}</p>
-          <p className='text-sm'>* 4.5</p>
+          
           <p className=''><span className='mr-3'> $ {price}</span><span className='mr-3 line-through'>$ {oldprice}</span><span
           className={`text-[12px] border ${
             Discount > 20

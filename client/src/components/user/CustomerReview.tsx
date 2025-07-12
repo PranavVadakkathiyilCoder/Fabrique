@@ -58,7 +58,7 @@ const CustomerReview = () => {
     const GetReview =async()=>{
       try {
         const res = await GetAllReview()
-        console.log("review",res.data.reviews);
+        //console.log("review",res.data.reviews);
         setreview(res.data.reviews)
         
       } catch (error) {

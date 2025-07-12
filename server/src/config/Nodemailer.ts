@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
-
+import dotenv from 'dotenv'
+dotenv.config()
 interface OrderItem {
   name: string;
   size?: string;
@@ -21,11 +22,11 @@ interface EmailData {
 
 export const sendOrderConfirmationEmail = async (data: EmailData) => {
   const transport = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
+    host: process.env.NODEMAILER_HOST,
     port: 2525,
     auth: {
-      user: "438029c991e843",
-      pass: "4f88b35625a7a6",
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS,
     },
   });
 

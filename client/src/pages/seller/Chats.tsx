@@ -1,7 +1,7 @@
+// src/pages/seller/Chats.tsx
 import React, { useEffect, useState } from 'react';
-import { getChat, getMessages, sendMessage } from '../../apis/chatMessageapi';
-import { IoMdSend } from 'react-icons/io';
-import { IoClose } from 'react-icons/io5';
+import { getChat } from '../../apis/chatMessageapi';
+import ChatPopup from '../../components/seller/ChatPopup';
 
 export interface User {
   _id: string;
@@ -59,38 +59,11 @@ const Chats: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [chatPopupOpen, setChatPopupOpen] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [message, setMessage] = useState('');
-  const [userId, setUserId] = useState('');
 
   const GetAllChats = async () => {
     try {
       const res = await getChat();
       setChats(res.data.Chats);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleChatClick = async (chat: Chat) => {
-    try {
-      setSelectedChat(chat);
-      setChatPopupOpen(true);
-      const res = await getMessages(chat._id);
-      setMessages(res.data.messages);
-      setUserId(res.data.user); // assuming backend returns user ID
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (!message.trim() || !selectedChat) return;
-    try {
-      await sendMessage(message, selectedChat._id);
-      const res = await getMessages(selectedChat._id);
-      setMessages(res.data.messages);
-      setMessage('');
     } catch (error) {
       console.log(error);
     }
@@ -127,7 +100,10 @@ const Chats: React.FC = () => {
               </p>
               <p className="text-gray-700 text-sm">Total: ₹{chat.order.totalAmount}</p>
               <button
-                onClick={() => handleChatClick(chat)}
+                onClick={() => {
+                  setSelectedChat(chat);
+                  setChatPopupOpen(true);
+                }}
                 className="mt-auto bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition text-sm"
               >
                 View Chat
@@ -138,71 +114,13 @@ const Chats: React.FC = () => {
       )}
 
       {chatPopupOpen && selectedChat && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white w-full max-w-sm max-h-[100dvh] rounded-lg shadow-lg flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className="flex justify-between items-center p-4 border-b">
-              <div>
-                <p className="text-sm font-semibold text-gray-800">
-                  Order #{selectedChat.order._id.slice(-6)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Total: ₹{selectedChat.order.totalAmount} |{' '}
-                  {selectedChat.order.items[0]?.name || 'Product'}
-                </p>
-              </div>
-              <button onClick={() => setChatPopupOpen(false)}>
-                <IoClose className="text-xl text-gray-600 hover:text-red-500" />
-              </button>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 p-4 overflow-y-auto text-sm text-gray-700 space-y-2">
-              {messages.length === 0 ? (
-                <p className="text-center text-gray-400">
-                  Start chatting with the customer...
-                </p>
-              ) : (
-                messages.map((msg, index) => {
-                  const isSender = msg.sender._id === userId;
-                  return (
-                    <div
-                      key={index}
-                      className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`px-4 py-2 max-w-[70%] rounded-lg text-sm ${
-                          isSender
-                            ? 'bg-black text-white rounded-br-none'
-                            : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                        }`}
-                      >
-                        {msg.content}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Input */}
-            <div className="p-3 border-t flex items-center gap-2">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 px-3 py-1.5 border rounded-full text-sm outline-none"
-              />
-              <button
-                onClick={handleSendMessage}
-                className="bg-black text-white rounded-full p-2 hover:bg-gray-800"
-              >
-                <IoMdSend className="text-lg" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <ChatPopup
+          chat={selectedChat}
+          onClose={() => {
+            setChatPopupOpen(false);
+            setSelectedChat(null);
+          }}
+        />
       )}
     </div>
   );

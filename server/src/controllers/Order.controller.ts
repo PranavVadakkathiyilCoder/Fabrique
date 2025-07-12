@@ -23,7 +23,7 @@ const createOrderCOD = async (req: AuthRequest, res: Response) => {
     const groupedCart = await Cart.aggregate([
       { $match: { user: new mongoose.Types.ObjectId(req.user_info._id) } },
       {
-        $lookup: {
+        $lookup: { 
           from: "products",
           localField: "product",
           foreignField: "_id",

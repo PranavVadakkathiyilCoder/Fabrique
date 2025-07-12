@@ -7,7 +7,7 @@ const Invoice: React.FC = () => {
   const printRef = useRef<HTMLDivElement | null>(null);
   const { state } = useLocation();
   const order = state?.order;
-  console.log(order);
+  //console.log(order);
 
   if (!order) return <p>No order data received.</p>;
 

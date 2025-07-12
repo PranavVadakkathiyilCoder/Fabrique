@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdSend } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { getMessages, sendMessage } from "../../apis/chatMessageapi";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 interface ChatProps {
     orderId: string;
@@ -26,16 +26,23 @@ const Chat: React.FC<ChatProps> = ({
 }) => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState<any[]>([]);
+    const [socketconn, setsocketconn] = useState(false)
+    const socketRef = useRef<Socket | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
-
     const handleSendMessage = async () => {
         if (!message.trim()) return;
 
         try {
             const res = await sendMessage(message, chatId);
-            console.log(res.data.messageData.content);
+            
             const mess = res.data.messageData.content
+            const msgdata = {
+                msg: res.data.messageData.content,
+                chatid: chatId,
+                userid: res.data.messageData.sender._id
 
+            }
+            socketRef.current?.emit('newmsg', msgdata)
             setMessages((prev) => [...prev, mess]);
             setMessage("");
         } catch (error) {
@@ -54,20 +61,31 @@ const Chat: React.FC<ChatProps> = ({
 
     useEffect(() => {
         const socket = io(import.meta.env.VITE_BACKEND_SERVER);
+        socketRef.current = socket;
         socket.on("connect", () => {
             console.log("Socket connected:", socket.id);
         });
+        socket.emit("makechat", chatId)
+        socket.on("connected", () => {
+            setsocketconn(true)
+        })
+        socket.on("message received", (newMsg) => {
+        console.log("Received new message via socket", newMsg);
+        
+        
+        setMessages((prev) => [...prev, newMsg]);
+    });
 
-       
         return () => {
             socket.disconnect();
         };
     }, [orderId, chatId])
     useEffect(() => {
-       fetchMessages();
 
-    }, [message])
-    
+        fetchMessages();
+
+    }, [messages])
+
     useEffect(() => {
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -103,7 +121,7 @@ const Chat: React.FC<ChatProps> = ({
                         messages.map((msg, idx) => {
                             if (!msg || !msg.content) return null;
 
-                            const senderId = msg.sender?._id;
+                            const senderId = msg.sender?._id || msg.sender;
                             const isSender = senderId ? senderId === userId : true;
 
                             return (
@@ -113,8 +131,8 @@ const Chat: React.FC<ChatProps> = ({
                                 >
                                     <div
                                         className={`px-4 py-2 max-w-[70%] rounded-lg text-sm ${isSender
-                                                ? "bg-black text-white rounded-br-none"
-                                                : "bg-gray-200 text-gray-800 rounded-bl-none"
+                                            ? "bg-black text-white rounded-br-none"
+                                            : "bg-gray-200 text-gray-800 rounded-bl-none"
                                             }`}
                                     >
                                         {msg.content}

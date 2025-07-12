@@ -93,7 +93,7 @@ formData.append('oldprice', oldprice.toString());
     try {
       
       const res = await AddProducts(formData)
-      console.log(res);
+      
       if(res.data.success){
         setLoading(false)
         successmsg(res.data.message)
@@ -109,14 +109,14 @@ formData.append('oldprice', oldprice.toString());
     }
 
 
-    console.log('Submitting product', {
-      name,
-      description,
-      images,
-      colors,
-      sizes,
-      totalStock,
-    });
+    //console.log('Submitting product', {
+    //  name,
+    //  description,
+    //  images,
+    //  colors,
+    //  sizes,
+    //  totalStock,
+    //});
 
     // Reset after submit
     setName('');

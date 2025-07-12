@@ -18,7 +18,7 @@ const Accessories = () => {
     const getProduct = async()=>{
       try {
         const data = await GetAccessories()
-      console.log(data);
+      //console.log(data);
       setproducts(data.data.products)
       } catch (error) {
         console.log(error);

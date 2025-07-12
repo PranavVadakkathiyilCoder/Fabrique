@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import OrderCard from "../../components/user/OrderCard";
 import OrderCardLoading from "../../components/Loading/OrderCardLoading";
 import { GetUserOrder } from "../../apis/order";
-import { BsFillChatDotsFill } from "react-icons/bs";
+import { useNavContext } from "../../context/NavContext";
 import { AiTwotonePrinter } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
@@ -37,7 +37,8 @@ interface Order {
 const OrdersList = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+    const { fetchUserInfo } = useNavContext();
+  
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -45,6 +46,7 @@ const OrdersList = () => {
       try {
         const res = await GetUserOrder();
         console.log(res.data.orders);
+        await fetchUserInfo();
         
         setOrders(res.data.orders);
       } catch (error) {

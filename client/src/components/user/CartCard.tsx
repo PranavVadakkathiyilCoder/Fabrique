@@ -25,7 +25,7 @@ const CartCard: React.FC<CartCardProps> = ({
   const DeleteCartItem = async (_id: string) => {
     try {
       const res = await deleteitemcart(_id);
-      console.log(res.data);
+      //console.log(res.data);
       refreshCart();
     } catch (error) {
       console.error("Error deleting cart item:", error);
